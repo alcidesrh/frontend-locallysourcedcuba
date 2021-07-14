@@ -1,0 +1,49 @@
+query listServiceQuery{
+  services{
+    id
+    _id
+    name
+    code
+    daysToShow
+  }
+}
+
+query getServiceQuery($id: ID!) {
+  service(id: $id) {
+    id
+    name
+    code
+    daysToShow
+  }
+}
+
+mutation createServiceMutation($input: createServiceInput!){
+  createService(input: $input) {
+            service {
+              id
+            }
+          }
+}
+
+mutation updateServiceMutation($input: updateServiceInput!){
+  updateService(input: $input) {
+            service {
+              id
+              _id
+              name
+              code
+              daysToShow
+            }
+          }
+}
+
+mutation deleteServiceMutation($input: deleteServiceInput!){
+  deleteService(input: $input){
+    service{
+      id
+    }
+  }
+}
+
+
+

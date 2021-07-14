@@ -1,0 +1,144 @@
+fragment transportationFragment on Transportation {
+  id
+  _id
+  name
+  driver {
+    id
+    name
+  }
+  prices {
+    id
+    min
+    max
+    price
+  }
+  routes {
+    id
+    locationFrom {
+      id
+      name
+    }
+    locationTo {
+      id
+      name
+    }
+    kms
+  }
+}
+
+query getTransportationsQuery {
+  transportations {
+    ...transportationFragment
+  }
+}
+
+query getTransportationQuery($id: ID!) {
+  transportation(id: $id) {
+    ...transportationFragment
+  }
+}
+
+mutation createTransportationMutation($input: createTransportationInput!) {
+  createTransportation(input: $input) {
+    transportation {
+      id
+    }
+  }
+}
+
+mutation createTransportationPriceMutation(
+  $input: createTransportationPriceInput!
+) {
+  createTransportationPrice(input: $input) {
+    transportationPrice {
+      id
+    }
+  }
+}
+
+mutation createTransportationRouteMutation(
+  $input: createTransportationRouteInput!
+) {
+  createTransportationRoute(input: $input) {
+    transportationRoute {
+      id
+      locationFrom {
+        id
+        name
+      }
+      locationTo {
+        id
+        name
+      }
+      kms
+    }
+  }
+}
+
+mutation updateTransportationMutation($input: updateTransportationInput!) {
+  updateTransportation(input: $input) {
+    transportation {
+      ...transportationFragment
+    }
+  }
+}
+
+mutation updateTransportationPriceMutation(
+  $input: updateTransportationPriceInput!
+) {
+  updateTransportationPrice(input: $input) {
+    transportationPrice {
+      id
+      min
+      max
+      price
+    }
+  }
+}
+
+mutation updateTransportationRouteMutation(
+  $input: updateTransportationRouteInput!
+) {
+  updateTransportationRoute(input: $input) {
+    transportationRoute {
+      id
+      locationFrom {
+        id
+        name
+      }
+      locationTo {
+        id
+        name
+      }
+      kms
+    }
+  }
+}
+
+mutation deleteTransportationMutation($input: deleteTransportationInput!) {
+  deleteTransportation(input: $input) {
+    transportation {
+      id
+    }
+  }
+}
+
+mutation deleteTransportationPriceMutation(
+  $input: deleteTransportationPriceInput!
+) {
+  deleteTransportationPrice(input: $input) {
+    transportationPrice {
+      id
+    }
+  }
+}
+
+mutation deleteTransportationRouteMutation(
+  $input: deleteTransportationRouteInput!
+) {
+  deleteTransportationRoute(input: $input) {
+    transportationRoute {
+      id
+    }
+  }
+}

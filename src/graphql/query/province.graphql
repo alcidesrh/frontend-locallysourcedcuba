@@ -1,0 +1,43 @@
+query listQuery{
+  provinces{
+    id
+    _id
+    name
+  }
+}
+
+query getItemQuery($id: ID!) {
+  province(id: $id) {
+    id
+    name
+  }
+}
+
+mutation createMutation($input: createProvinceInput!){
+  createProvince(input: $input) {
+            province {
+              id
+            }
+          }
+}
+
+mutation updateMutation($input: updateProvinceInput!){
+  updateProvince(input: $input) {
+            province {
+              id
+              _id
+              name
+            }
+          }
+}
+
+mutation deleteMutation($input: deleteProvinceInput!){
+  deleteProvince(input: $input){
+    province{
+      id
+    }
+  }
+}
+
+
+

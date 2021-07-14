@@ -1,0 +1,153 @@
+fragment htcTourTemplateFragment on TourTemplate {
+  id
+  _id
+  name
+  code
+  color
+  type
+  startPlace
+  finishPlace
+  description
+  notifications {
+    id
+    name
+    icon
+    days
+    notification {
+      id
+    }
+  }
+  activities {
+    id
+    name
+    destination {
+      id
+    }
+  }
+  template1 {
+    id
+    color
+    type
+    name
+  }
+  template2 {
+    id
+    color
+    type
+    name
+  }
+}
+
+query listHtcTourTemplateQuery {
+  tourTemplates(tourType: "htc") {
+    ...htcTourTemplateFragment
+  }
+}
+
+query getTourTemplateQuery($id: ID!) {
+  tourTemplate(id: $id) {
+    ...htcTourTemplateFragment
+  }
+}
+
+mutation createTourTemplateMutation($input: createTourTemplateInput!) {
+  createTourTemplate(input: $input) {
+    tourTemplate {
+      ...htcTourTemplateFragment
+    }
+  }
+}
+
+mutation updateHtcTourTemplateMutation($input: updateTourTemplateInput!) {
+  updateTourTemplate(input: $input) {
+    tourTemplate {
+      ...htcTourTemplateFragment
+    }
+  }
+}
+
+mutation deleteTourTemplateMutation($input: deleteTourTemplateInput!) {
+  deleteTourTemplate(input: $input) {
+    tourTemplate {
+      id
+    }
+  }
+}
+
+# Ls Tour****************************************
+
+fragment lsTourTemplateFragment on TourTemplate {
+  id
+  _id
+  name
+  code
+  color
+  type
+  startPlace
+  finishPlace
+  description
+  notifications {
+    id
+    name
+    icon
+    days
+    notification {
+      id
+    }
+  }
+  activities {
+    id
+    name
+    destination {
+      id
+    }
+  }
+  template1 {
+    id
+    color
+    type
+    name
+  }
+  template2 {
+    id
+    color
+    type
+    name
+  }
+}
+
+query listLsTourTemplateQuery {
+  tourTemplates(tourType: "ls") {
+    ...lsTourTemplateFragment
+  }
+}
+
+# query getTourTemplateQuery($id: ID!) {
+#   tourTemplate(id: $id) {
+#     ...lsTourTemplateFragment
+#   }
+# }
+
+# mutation createTourTemplateMutation($input: createTourTemplateInput!) {
+#   createTourTemplate(input: $input) {
+#     tourTemplate {
+#       ...lsTourTemplateFragment
+#     }
+#   }
+# }
+
+mutation updateLsTourTemplateMutation($input: updateTourTemplateInput!) {
+  updateTourTemplate(input: $input) {
+    tourTemplate {
+      ...lsTourTemplateFragment
+    }
+  }
+}
+
+# mutation deleteTourTemplateMutation($input: deleteTourTemplateInput!) {
+#   deleteTourTemplate(input: $input) {
+#     tourTemplate {
+#       id
+#     }
+#   }
+# }

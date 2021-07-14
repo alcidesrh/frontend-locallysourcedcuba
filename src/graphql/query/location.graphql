@@ -1,0 +1,127 @@
+fragment locationFragment on Location {
+  id
+  name
+}
+
+fragment locationDistanceFragment on LocationDistance {
+  id
+  _id
+  location1 {
+    id
+    name
+  }
+  location2 {
+    id
+    name
+  }
+  kms
+}
+
+query getLocationsQuery($order: [LocationFilter_order]) {
+  locations(order: $order) {
+    id
+    name
+  }
+}
+
+query getLocationQuery($id: ID!) {
+  location(id: $id) {
+    ...locationFragment
+  }
+}
+
+query getLocationDistanceQuery($id: ID!) {
+  locationDistance(id: $id) {
+    ...locationDistanceFragment
+  }
+}
+
+query listLocationQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [LocationFilter_order]
+  $needle: String
+) {
+  listLocations(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
+      ...locationFragment
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+query listLocationDistanceQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $needle: String
+) {
+  listLocationDistances(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    needle: $needle
+  ) {
+    collection {
+      ...locationDistanceFragment
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+mutation createLocationMutation($input: createLocationInput!) {
+  createLocation(input: $input) {
+    location {
+      id
+    }
+  }
+}
+
+mutation createLocationDistanceMutation($input: createLocationDistanceInput!) {
+  createLocationDistance(input: $input) {
+    locationDistance {
+      id
+    }
+  }
+}
+
+mutation updateLocationMutation($input: updateLocationInput!) {
+  updateLocation(input: $input) {
+    location {
+      ...locationFragment
+    }
+  }
+}
+
+mutation updateLocationDistanceMutation($input: updateLocationDistanceInput!) {
+  updateLocationDistance(input: $input) {
+    locationDistance {
+      ...locationDistanceFragment
+    }
+  }
+}
+
+mutation deleteLocationMutation($input: deleteLocationInput!) {
+  deleteLocation(input: $input) {
+    location {
+      id
+    }
+  }
+}
+
+mutation deleteLocationDistanceMutation($input: deleteLocationDistanceInput!) {
+  deleteLocationDistance(input: $input) {
+    locationDistance {
+      id
+    }
+  }
+}

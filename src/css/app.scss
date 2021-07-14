@@ -1,0 +1,7 @@
+// app global css in SCSS form
+.notification-icon-color {
+  color: $blue-grey-6;
+}
+button.q-btn:not(.q-btn--round) {
+  min-width: 120px;
+}

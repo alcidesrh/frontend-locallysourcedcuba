@@ -1,0 +1,16 @@
+overwrite: true
+schema: "http://127.0.0.1:8000/api/graphql"
+# schema: "https://127.0.0.1:8000/schema.graphql"
+# documents: "src/**/*.graphql"
+generates:
+  src/graphql/@types/types.d.ts:
+    plugins:
+      - "typescript"
+  src/graphql/@types/graphql.modules.d.ts:
+    documents: "src/graphql/query/*.graphql"
+    plugins:
+      - typescript-graphql-files-modules    
+      # - "fragment-matcher"
+  # ./graphql.schema.json:
+  #   plugins:
+  #     - "introspection"

@@ -1,0 +1,272 @@
+fragment houseRoomFragment on HouseRoom {
+  id
+  price
+  roomType {
+    id
+    name
+  }
+}
+fragment houseFragment on House {
+  id
+  _id
+  name
+  phone
+  address
+  email
+  description
+  type {
+    id
+    name
+  }
+  destination {
+    id
+    name
+  }
+  features {
+    id
+    name
+  }
+  rooms {
+    ...houseRoomFragment
+  }
+  houseSeasons {
+    id
+    startDate
+    endDate
+    seasonRooms {
+      id
+      price
+      room {
+        id
+        roomType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query getHouseQuery($id: ID!) {
+  house(id: $id) {
+    ...houseFragment
+  }
+}
+
+query listHouseQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [HouseFilter_order]
+  $needle: String
+) {
+  listHouses(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
+      ...houseFragment
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+mutation createHouseMutation($input: createHouseInput!) {
+  createHouse(input: $input) {
+    house {
+      id
+    }
+  }
+}
+
+mutation updateHouseMutation($input: updateHouseInput!) {
+  updateHouse(input: $input) {
+    house {
+      ...houseFragment
+    }
+  }
+}
+
+mutation deleteHouseMutation($input: deleteHouseInput!) {
+  deleteHouse(input: $input) {
+    house {
+      id
+    }
+  }
+}
+
+query listHouseTypeQuery {
+  houseTypes {
+    id
+    name
+  }
+}
+
+mutation deleteHouseTypeMutation($input: deleteHouseTypeInput!) {
+  deleteHouseType(input: $input) {
+    houseType {
+      id
+    }
+  }
+}
+
+mutation createHouseTypeMutation($input: createHouseTypeInput!) {
+  createHouseType(input: $input) {
+    houseType {
+      id
+    }
+  }
+}
+
+mutation updateHouseTypeMutation($input: updateHouseTypeInput!) {
+  updateHouseType(input: $input) {
+    houseType {
+      id
+      name
+    }
+  }
+}
+
+query listHouseRoomTypeQuery {
+  houseRoomTypes {
+    id
+    name
+  }
+}
+
+mutation deleteHouseRoomTypeMutation($input: deleteHouseRoomTypeInput!) {
+  deleteHouseRoomType(input: $input) {
+    houseRoomType {
+      id
+    }
+  }
+}
+
+mutation createHouseRoomTypeMutation($input: createHouseRoomTypeInput!) {
+  createHouseRoomType(input: $input) {
+    houseRoomType {
+      id
+    }
+  }
+}
+
+mutation updateHouseRoomTypeMutation($input: updateHouseRoomTypeInput!) {
+  updateHouseRoomType(input: $input) {
+    houseRoomType {
+      id
+      name
+    }
+  }
+}
+
+query listHouseFeatureQuery {
+  houseFeatures {
+    id
+    name
+  }
+}
+
+# query listHouseHouseRoomTypeQuery {
+#   houseR {
+#     id
+#     name
+#   }
+# }
+
+mutation deleteHouseFeatureMutation($input: deleteHouseFeatureInput!) {
+  deleteHouseFeature(input: $input) {
+    houseFeature {
+      id
+    }
+  }
+}
+
+mutation createHouseFeatureMutation($input: createHouseFeatureInput!) {
+  createHouseFeature(input: $input) {
+    houseFeature {
+      id
+    }
+  }
+}
+
+mutation updateHouseFeatureMutation($input: updateHouseFeatureInput!) {
+  updateHouseFeature(input: $input) {
+    houseFeature {
+      id
+      name
+    }
+  }
+}
+
+mutation createHouseRoomMutation($input: createHouseRoomInput!) {
+  createHouseRoom(input: $input) {
+    houseRoom {
+      ...houseRoomFragment
+    }
+  }
+}
+
+mutation updateHouseRoomMutation($input: updateHouseRoomInput!) {
+  updateHouseRoom(input: $input) {
+    houseRoom {
+      ...houseRoomFragment
+    }
+  }
+}
+
+mutation deleteHouseRoomMutation($input: deleteHouseRoomInput!) {
+  deleteHouseRoom(input: $input) {
+    houseRoom {
+      id
+    }
+  }
+}
+
+mutation createHouseSeasonMutation($input: createHouseSeasonInput!) {
+  createHouseSeason(input: $input) {
+    houseSeason {
+      id
+    }
+  }
+}
+
+mutation createHouseSeasonRoomMutation($input: createHouseSeasonRoomInput!) {
+  createHouseSeasonRoom(input: $input) {
+    houseSeasonRoom {
+      id
+      price
+      room {
+        id
+        roomType {
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation updateHouseSeasonRoomMutation($input: updateHouseSeasonRoomInput!) {
+  updateHouseSeasonRoom(input: $input) {
+    houseSeasonRoom {
+      id
+      price
+      room {
+        roomType {
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation deleteHouseSeasonMutation($input: deleteHouseSeasonInput!) {
+  deleteHouseSeason(input: $input) {
+    houseSeason {
+      id
+    }
+  }
+}

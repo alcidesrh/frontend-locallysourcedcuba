@@ -1,0 +1,87 @@
+fragment activityFragment on Activity {
+  id
+  _id
+  name
+  type
+  destination {
+    id
+    name
+  }
+  personCost
+  guideCost
+  carCost
+  personPerCar
+  activities {
+    id
+    priority
+    activity {
+      id
+      name
+    }
+  }
+}
+query getActivityQuery($id: ID!) {
+  activity(id: $id) {
+    ...activityFragment
+  }
+}
+
+query listActivityQuery($order: [ActivityFilter_order], $needle: String) {
+  listActivities(order: $order, needle: $needle) {
+    ...activityFragment
+  }
+}
+
+mutation createActivityMutation($input: createActivityInput!) {
+  createActivity(input: $input) {
+    activity {
+      id
+    }
+  }
+}
+
+mutation updateActivityMutation($input: updateActivityInput!) {
+  updateActivity(input: $input) {
+    activity {
+      ...activityFragment
+    }
+  }
+}
+
+mutation deleteActivityMutation($input: deleteActivityInput!) {
+  deleteActivity(input: $input) {
+    activity {
+      id
+    }
+  }
+}
+
+mutation createActivityComboMutation($input: createActivityComboInput!) {
+  createActivityCombo(input: $input) {
+    activityCombo {
+      id
+      activity {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation priorityActivityComboMutation($input: priorityActivityComboInput!) {
+  priorityActivityCombo(input: $input) {
+    activityCombo {
+      id
+      priority
+    }
+  }
+}
+
+mutation deleteActivityComboMutation($input: deleteActivityComboInput!) {
+  deleteActivityCombo(input: $input) {
+    activityCombo {
+      id
+      priority
+    }
+  }
+}

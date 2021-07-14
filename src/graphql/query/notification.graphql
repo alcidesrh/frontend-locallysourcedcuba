@@ -1,0 +1,135 @@
+query getNotificationQuery($id: ID!) {
+  notification(id: $id) {
+    id
+    _id
+    name
+    icon
+    days
+    priority
+    services {
+      id
+      name
+    }
+  }
+}
+
+query getNotificationsQuery($services_code: String!) {
+  notifications(services_code: $services_code) {
+    id
+    name
+    icon
+    days
+  }
+}
+
+query listNotificationQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [NotificationFilter_order]
+  $needle: String
+) {
+  listNotifications(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
+      id
+      _id
+      name
+      icon
+      days
+      priority
+      services {
+        id
+        name
+      }
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+mutation createNotificationMutation($input: createNotificationInput!) {
+  createNotification(input: $input) {
+    notification {
+      id
+    }
+  }
+}
+
+mutation updateNotificationMutation($input: updateNotificationInput!) {
+  updateNotification(input: $input) {
+    notification {
+      id
+      _id
+      name
+      icon
+      days
+      priority
+      services {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation priorityNotificationMutation($input: priorityNotificationInput!) {
+  priorityNotification(input: $input) {
+    notification {
+      id
+      priority
+    }
+  }
+}
+
+mutation deleteNotificationMutation($input: deleteNotificationInput!) {
+  deleteNotification(input: $input) {
+    notification {
+      id
+    }
+  }
+}
+
+mutation createNotificationTourTemplateMutation(
+  $input: createNotificationTourTemplateInput!
+) {
+  createNotificationTourTemplate(input: $input) {
+    notificationTourTemplate {
+      id
+      name
+      icon
+      days
+      notification {
+        id
+      }
+    }
+  }
+}
+
+mutation updateNotificationTourTemplateMutation(
+  $input: updateNotificationTourTemplateInput!
+) {
+  updateNotificationTourTemplate(input: $input) {
+    notificationTourTemplate {
+      id
+      name
+      icon
+      days
+    }
+  }
+}
+
+mutation deleteNotificationTourTemplateMutation(
+  $input: deleteNotificationTourTemplateInput!
+) {
+  deleteNotificationTourTemplate(input: $input) {
+    notificationTourTemplate {
+      id
+    }
+  }
+}

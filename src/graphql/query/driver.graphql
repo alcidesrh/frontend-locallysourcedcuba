@@ -1,0 +1,70 @@
+query getDriverQuery($id: ID!) {
+  driver(id: $id) {
+    id
+    _id
+    name
+    phone
+    pax
+  }
+}
+
+query getDriversQuery($order: [DriverFilter_order]) {
+  drivers(order: $order) {
+    id
+    name
+  }
+}
+
+query listDriverQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [DriverFilter_order]
+  $needle: String
+) {
+  listDrivers(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
+      id
+      _id
+      name
+      phone
+      pax
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+mutation createDriverMutation($input: createDriverInput!) {
+  createDriver(input: $input) {
+    driver {
+      id
+    }
+  }
+}
+
+mutation updateDriverMutation($input: updateDriverInput!) {
+  updateDriver(input: $input) {
+    driver {
+      id
+      _id
+      name
+      phone
+      pax
+    }
+  }
+}
+
+mutation deleteDriverMutation($input: deleteDriverInput!) {
+  deleteDriver(input: $input) {
+    driver {
+      id
+    }
+  }
+}

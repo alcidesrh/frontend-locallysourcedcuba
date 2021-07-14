@@ -1,0 +1,73 @@
+query destinationsQuery {
+  destinations {
+    id
+    name
+  }
+}
+query listDestinationQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [DestinationFilter_order]
+  $needle: String
+) {
+  listDestinations(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
+      id
+      _id
+      name
+      province {
+        id
+        name
+      }
+    }
+    paginationInfo {
+      totalCount
+      lastPage
+    }
+  }
+}
+
+query getDestinationQuery($id: ID!) {
+  destination(id: $id) {
+    id
+    name
+    province {
+      id
+      name
+    }
+  }
+}
+
+mutation createDestinationMutation($input: createDestinationInput!) {
+  createDestination(input: $input) {
+    destination {
+      id
+    }
+  }
+}
+
+mutation updateDestinationMutation($input: updateDestinationInput!) {
+  updateDestination(input: $input) {
+    destination {
+      id
+      name
+      province {
+        id
+        name
+      }
+    }
+  }
+}
+
+mutation deleteDestinationMutation($input: deleteDestinationInput!) {
+  deleteDestination(input: $input) {
+    destination {
+      id
+    }
+  }
+}

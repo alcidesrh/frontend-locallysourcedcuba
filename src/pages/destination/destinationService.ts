@@ -9,6 +9,7 @@ import { useQuery } from '@vue/apollo-composable';
 import useEntityFactory from 'src/composables/useEntityFactory';
 import { LocalStorage } from 'quasar';
 import { ref } from 'vue';
+import { DocumentNode } from 'node_modules/graphql/index.d';
 
 const {
   item,
@@ -69,8 +70,8 @@ function getItem(id: string) {
 
 const destinations = ref<Partial<Destination>[]>([]);
 
-function destinationsList() {
-  const { loading, onError, onResult } = useQuery(destinationsQuery);
+function destinationsList(query: DocumentNode | null = null) {
+  const { loading, onError, onResult } = useQuery(query || destinationsQuery);
 
   onResult(
     (result: {

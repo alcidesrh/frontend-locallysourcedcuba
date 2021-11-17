@@ -32,6 +32,13 @@ query getTransportationsQuery {
   }
 }
 
+query getTransportationsSelectQuery {
+  transportations {
+    id
+    name
+  }
+}
+
 query getTransportationQuery($id: ID!) {
   transportation(id: $id) {
     ...transportationFragment

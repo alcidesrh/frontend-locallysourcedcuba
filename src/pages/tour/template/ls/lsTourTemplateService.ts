@@ -1,7 +1,7 @@
 import { TourTemplate } from 'src/graphql/@types/types.d';
 import {
   listLsTourTemplateQuery,
-  getTourTemplateQuery,
+  getLsTourTemplateQuery,
 } from 'src/graphql/query/tourTemplate.graphql';
 import { error } from 'src/helpers/notification';
 import { useQuery } from '@vue/apollo-composable';
@@ -27,8 +27,8 @@ function list() {
 }
 
 function getItem(id: string) {
-  const { onError, onResult } = useQuery(
-    getTourTemplateQuery,
+  const { onError, onResult, loading } = useQuery(
+    getLsTourTemplateQuery,
     () => ({
       id: `/api/tour_templates/${id}`,
     }),
@@ -43,6 +43,8 @@ function getItem(id: string) {
   onResult((result: { data: { tourTemplate: TourTemplate } }) => {
     item.value = Object.assign({}, result.data.tourTemplate);
   });
+
+  return { loading };
 }
 
 export default function service() {

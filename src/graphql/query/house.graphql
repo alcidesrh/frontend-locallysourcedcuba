@@ -75,6 +75,13 @@ query listHouseQuery(
   }
 }
 
+query housesQuery($destinationID: String) {
+  houses(destination: $destinationID) {
+    id
+    name
+  }
+}
+
 mutation createHouseMutation($input: createHouseInput!) {
   createHouse(input: $input) {
     house {

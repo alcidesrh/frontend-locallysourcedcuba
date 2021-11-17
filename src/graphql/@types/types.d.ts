@@ -38,6 +38,69 @@ export type ActivityFilter_Order = {
   name?: Maybe<Scalars['String']>;
 };
 
+export type Booking = Node & {
+  __typename?: 'Booking';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  pax?: Maybe<Scalars['Int']>;
+  lp?: Maybe<Scalars['Int']>;
+  tours?: Maybe<Array<Maybe<Tour>>>;
+  sleepingRequirement?: Maybe<SleepingRequirement>;
+  bookingAccommodations?: Maybe<Array<Maybe<BookingAccommodation>>>;
+  note?: Maybe<Scalars['String']>;
+  transfersIn?: Maybe<Array<Maybe<BookingTransfer>>>;
+  transfersOut?: Maybe<Array<Maybe<BookingTransfer>>>;
+};
+
+export type BookingAccommodation = Node & {
+  __typename?: 'BookingAccommodation';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  dateIn?: Maybe<Scalars['String']>;
+  dateOut?: Maybe<Scalars['String']>;
+  booking: Booking;
+  canceled?: Maybe<Scalars['Boolean']>;
+  houses?: Maybe<Array<Maybe<BookingHouse>>>;
+};
+
+export type BookingHouse = Node & {
+  __typename?: 'BookingHouse';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  house?: Maybe<House>;
+  rooms?: Maybe<Array<Maybe<HouseRoom>>>;
+  bookingAccommodation?: Maybe<BookingAccommodation>;
+};
+
+export type BookingTransfer = Node & {
+  __typename?: 'BookingTransfer';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  contact?: Maybe<Scalars['String']>;
+  persons?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+  hour?: Maybe<Scalars['String']>;
+  flightData?: Maybe<Scalars['String']>;
+  destination?: Maybe<Destination>;
+  price?: Maybe<Scalars['Int']>;
+  fromHour?: Maybe<Scalars['String']>;
+  toHour?: Maybe<Scalars['String']>;
+  houses?: Maybe<Array<Maybe<House>>>;
+  driver?: Maybe<Driver>;
+  charge?: Maybe<Scalars['Int']>;
+  sent?: Maybe<Scalars['Boolean']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  note?: Maybe<Scalars['String']>;
+};
+
+
+export type BookingTransferHousesArgs = {
+  order?: Maybe<Array<Maybe<HouseFilter_Order>>>;
+  destination?: Maybe<Scalars['String']>;
+  destination_list?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
 export type Destination = Node & {
   __typename?: 'Destination';
   id: Scalars['ID'];
@@ -53,6 +116,8 @@ export type DestinationHousesArgs = {
   page?: Maybe<Scalars['Int']>;
   itemsPerPage?: Maybe<Scalars['Int']>;
   order?: Maybe<Array<Maybe<HouseFilter_Order>>>;
+  destination?: Maybe<Scalars['String']>;
+  destination_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -172,6 +237,8 @@ export type HouseFeature = Node & {
 
 export type HouseFeatureHousesArgs = {
   order?: Maybe<Array<Maybe<HouseFilter_Order>>>;
+  destination?: Maybe<Scalars['String']>;
+  destination_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 export type HouseFilter_Order = {
@@ -234,6 +301,61 @@ export type HouseType = Node & {
 
 export type HouseTypeHousesArgs = {
   order?: Maybe<Array<Maybe<HouseFilter_Order>>>;
+  destination?: Maybe<Scalars['String']>;
+  destination_list?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+export type Itinerary = Node & {
+  __typename?: 'Itinerary';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  days: Scalars['Int'];
+  destination?: Maybe<Destination>;
+  itineraryDays?: Maybe<Array<Maybe<ItineraryDay>>>;
+  house?: Maybe<House>;
+  tour: Tour;
+};
+
+export type ItineraryDay = Node & {
+  __typename?: 'ItineraryDay';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  itinerary: Itinerary;
+  activities?: Maybe<Array<Maybe<Activity>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+};
+
+
+export type ItineraryDayActivitiesArgs = {
+  order?: Maybe<Array<Maybe<ActivityFilter_Order>>>;
+};
+
+export type ItineraryDayTemplate = Node & {
+  __typename?: 'ItineraryDayTemplate';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  itinerary: ItineraryTemplate;
+  activities?: Maybe<Array<Maybe<Activity>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+};
+
+
+export type ItineraryDayTemplateActivitiesArgs = {
+  order?: Maybe<Array<Maybe<ActivityFilter_Order>>>;
+};
+
+export type ItineraryTemplate = Node & {
+  __typename?: 'ItineraryTemplate';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  days: Scalars['Int'];
+  destination?: Maybe<Destination>;
+  itineraryDays?: Maybe<Array<Maybe<ItineraryDayTemplate>>>;
+  house?: Maybe<House>;
+  tourTemplate: TourTemplate;
 };
 
 export type Location = Node & {
@@ -296,6 +418,24 @@ export type Mutation = {
   updateActivityCombo?: Maybe<UpdateActivityComboPayload>;
   /** Deletes a ActivityCombo. */
   deleteActivityCombo?: Maybe<DeleteActivityComboPayload>;
+  /** Deletes a BookingHouse. */
+  deleteBookingHouse?: Maybe<DeleteBookingHousePayload>;
+  /** Updates a BookingHouse. */
+  updateBookingHouse?: Maybe<UpdateBookingHousePayload>;
+  /** Creates a BookingHouse. */
+  createBookingHouse?: Maybe<CreateBookingHousePayload>;
+  /** Deletes a ItineraryDay. */
+  deleteItineraryDay?: Maybe<DeleteItineraryDayPayload>;
+  /** Updates a ItineraryDay. */
+  updateItineraryDay?: Maybe<UpdateItineraryDayPayload>;
+  /** Creates a ItineraryDay. */
+  createItineraryDay?: Maybe<CreateItineraryDayPayload>;
+  /** Deletes a Booking. */
+  deleteBooking?: Maybe<DeleteBookingPayload>;
+  /** Updates a Booking. */
+  updateBooking?: Maybe<UpdateBookingPayload>;
+  /** Creates a Booking. */
+  createBooking?: Maybe<CreateBookingPayload>;
   /** Deletes a TourTemplate. */
   deleteTourTemplate?: Maybe<DeleteTourTemplatePayload>;
   /** Updates a TourTemplate. */
@@ -326,6 +466,12 @@ export type Mutation = {
   updateDriver?: Maybe<UpdateDriverPayload>;
   /** Deletes a Driver. */
   deleteDriver?: Maybe<DeleteDriverPayload>;
+  /** Deletes a Itinerary. */
+  deleteItinerary?: Maybe<DeleteItineraryPayload>;
+  /** Updates a Itinerary. */
+  updateItinerary?: Maybe<UpdateItineraryPayload>;
+  /** Creates a Itinerary. */
+  createItinerary?: Maybe<CreateItineraryPayload>;
   /** Creates a Activity. */
   createActivity?: Maybe<CreateActivityPayload>;
   /** Updates a Activity. */
@@ -362,6 +508,24 @@ export type Mutation = {
   updateHouseRoom?: Maybe<UpdateHouseRoomPayload>;
   /** Creates a HouseRoom. */
   createHouseRoom?: Maybe<CreateHouseRoomPayload>;
+  /** Deletes a NotificationTour. */
+  deleteNotificationTour?: Maybe<DeleteNotificationTourPayload>;
+  /** Updates a NotificationTour. */
+  updateNotificationTour?: Maybe<UpdateNotificationTourPayload>;
+  /** Creates a NotificationTour. */
+  createNotificationTour?: Maybe<CreateNotificationTourPayload>;
+  /** Deletes a SleepingRequirement. */
+  deleteSleepingRequirement?: Maybe<DeleteSleepingRequirementPayload>;
+  /** Updates a SleepingRequirement. */
+  updateSleepingRequirement?: Maybe<UpdateSleepingRequirementPayload>;
+  /** Creates a SleepingRequirement. */
+  createSleepingRequirement?: Maybe<CreateSleepingRequirementPayload>;
+  /** Deletes a BookingAccommodation. */
+  deleteBookingAccommodation?: Maybe<DeleteBookingAccommodationPayload>;
+  /** Updates a BookingAccommodation. */
+  updateBookingAccommodation?: Maybe<UpdateBookingAccommodationPayload>;
+  /** Creates a BookingAccommodation. */
+  createBookingAccommodation?: Maybe<CreateBookingAccommodationPayload>;
   /** Deletes a HouseSeason. */
   deleteHouseSeason?: Maybe<DeleteHouseSeasonPayload>;
   /** Updates a HouseSeason. */
@@ -380,12 +544,30 @@ export type Mutation = {
   updateNotificationTourTemplate?: Maybe<UpdateNotificationTourTemplatePayload>;
   /** Creates a NotificationTourTemplate. */
   createNotificationTourTemplate?: Maybe<CreateNotificationTourTemplatePayload>;
+  /** Deletes a SRRoomType. */
+  deleteSRRoomType?: Maybe<DeleteSrRoomTypePayload>;
+  /** Updates a SRRoomType. */
+  updateSRRoomType?: Maybe<UpdateSrRoomTypePayload>;
+  /** Creates a SRRoomType. */
+  createSRRoomType?: Maybe<CreateSrRoomTypePayload>;
+  /** Deletes a ItineraryDayTemplate. */
+  deleteItineraryDayTemplate?: Maybe<DeleteItineraryDayTemplatePayload>;
+  /** Updates a ItineraryDayTemplate. */
+  updateItineraryDayTemplate?: Maybe<UpdateItineraryDayTemplatePayload>;
+  /** Creates a ItineraryDayTemplate. */
+  createItineraryDayTemplate?: Maybe<CreateItineraryDayTemplatePayload>;
   /** Creates a Guide. */
   createGuide?: Maybe<CreateGuidePayload>;
   /** Updates a Guide. */
   updateGuide?: Maybe<UpdateGuidePayload>;
   /** Deletes a Guide. */
   deleteGuide?: Maybe<DeleteGuidePayload>;
+  /** Deletes a ItineraryTemplate. */
+  deleteItineraryTemplate?: Maybe<DeleteItineraryTemplatePayload>;
+  /** Updates a ItineraryTemplate. */
+  updateItineraryTemplate?: Maybe<UpdateItineraryTemplatePayload>;
+  /** Creates a ItineraryTemplate. */
+  createItineraryTemplate?: Maybe<CreateItineraryTemplatePayload>;
   /** Deletes a HouseFeature. */
   deleteHouseFeature?: Maybe<DeleteHouseFeaturePayload>;
   /** Updates a HouseFeature. */
@@ -398,6 +580,12 @@ export type Mutation = {
   updateProvince?: Maybe<UpdateProvincePayload>;
   /** Creates a Province. */
   createProvince?: Maybe<CreateProvincePayload>;
+  /** Deletes a BookingTransfer. */
+  deleteBookingTransfer?: Maybe<DeleteBookingTransferPayload>;
+  /** Updates a BookingTransfer. */
+  updateBookingTransfer?: Maybe<UpdateBookingTransferPayload>;
+  /** Creates a BookingTransfer. */
+  createBookingTransfer?: Maybe<CreateBookingTransferPayload>;
   /** Creates a TransportationRoute. */
   createTransportationRoute?: Maybe<CreateTransportationRoutePayload>;
   /** Updates a TransportationRoute. */
@@ -410,6 +598,12 @@ export type Mutation = {
   updateHouseSeasonRoom?: Maybe<UpdateHouseSeasonRoomPayload>;
   /** Creates a HouseSeasonRoom. */
   createHouseSeasonRoom?: Maybe<CreateHouseSeasonRoomPayload>;
+  /** Creates a Tour. */
+  createTour?: Maybe<CreateTourPayload>;
+  /** Updates a Tour. */
+  updateTour?: Maybe<UpdateTourPayload>;
+  /** Deletes a Tour. */
+  deleteTour?: Maybe<DeleteTourPayload>;
   /** Deletes a HouseType. */
   deleteHouseType?: Maybe<DeleteHouseTypePayload>;
   /** Updates a HouseType. */
@@ -444,6 +638,51 @@ export type MutationUpdateActivityComboArgs = {
 
 export type MutationDeleteActivityComboArgs = {
   input: DeleteActivityComboInput;
+};
+
+
+export type MutationDeleteBookingHouseArgs = {
+  input: DeleteBookingHouseInput;
+};
+
+
+export type MutationUpdateBookingHouseArgs = {
+  input: UpdateBookingHouseInput;
+};
+
+
+export type MutationCreateBookingHouseArgs = {
+  input: CreateBookingHouseInput;
+};
+
+
+export type MutationDeleteItineraryDayArgs = {
+  input: DeleteItineraryDayInput;
+};
+
+
+export type MutationUpdateItineraryDayArgs = {
+  input: UpdateItineraryDayInput;
+};
+
+
+export type MutationCreateItineraryDayArgs = {
+  input: CreateItineraryDayInput;
+};
+
+
+export type MutationDeleteBookingArgs = {
+  input: DeleteBookingInput;
+};
+
+
+export type MutationUpdateBookingArgs = {
+  input: UpdateBookingInput;
+};
+
+
+export type MutationCreateBookingArgs = {
+  input: CreateBookingInput;
 };
 
 
@@ -519,6 +758,21 @@ export type MutationUpdateDriverArgs = {
 
 export type MutationDeleteDriverArgs = {
   input: DeleteDriverInput;
+};
+
+
+export type MutationDeleteItineraryArgs = {
+  input: DeleteItineraryInput;
+};
+
+
+export type MutationUpdateItineraryArgs = {
+  input: UpdateItineraryInput;
+};
+
+
+export type MutationCreateItineraryArgs = {
+  input: CreateItineraryInput;
 };
 
 
@@ -612,6 +866,51 @@ export type MutationCreateHouseRoomArgs = {
 };
 
 
+export type MutationDeleteNotificationTourArgs = {
+  input: DeleteNotificationTourInput;
+};
+
+
+export type MutationUpdateNotificationTourArgs = {
+  input: UpdateNotificationTourInput;
+};
+
+
+export type MutationCreateNotificationTourArgs = {
+  input: CreateNotificationTourInput;
+};
+
+
+export type MutationDeleteSleepingRequirementArgs = {
+  input: DeleteSleepingRequirementInput;
+};
+
+
+export type MutationUpdateSleepingRequirementArgs = {
+  input: UpdateSleepingRequirementInput;
+};
+
+
+export type MutationCreateSleepingRequirementArgs = {
+  input: CreateSleepingRequirementInput;
+};
+
+
+export type MutationDeleteBookingAccommodationArgs = {
+  input: DeleteBookingAccommodationInput;
+};
+
+
+export type MutationUpdateBookingAccommodationArgs = {
+  input: UpdateBookingAccommodationInput;
+};
+
+
+export type MutationCreateBookingAccommodationArgs = {
+  input: CreateBookingAccommodationInput;
+};
+
+
 export type MutationDeleteHouseSeasonArgs = {
   input: DeleteHouseSeasonInput;
 };
@@ -657,6 +956,36 @@ export type MutationCreateNotificationTourTemplateArgs = {
 };
 
 
+export type MutationDeleteSrRoomTypeArgs = {
+  input: DeleteSrRoomTypeInput;
+};
+
+
+export type MutationUpdateSrRoomTypeArgs = {
+  input: UpdateSrRoomTypeInput;
+};
+
+
+export type MutationCreateSrRoomTypeArgs = {
+  input: CreateSrRoomTypeInput;
+};
+
+
+export type MutationDeleteItineraryDayTemplateArgs = {
+  input: DeleteItineraryDayTemplateInput;
+};
+
+
+export type MutationUpdateItineraryDayTemplateArgs = {
+  input: UpdateItineraryDayTemplateInput;
+};
+
+
+export type MutationCreateItineraryDayTemplateArgs = {
+  input: CreateItineraryDayTemplateInput;
+};
+
+
 export type MutationCreateGuideArgs = {
   input: CreateGuideInput;
 };
@@ -669,6 +998,21 @@ export type MutationUpdateGuideArgs = {
 
 export type MutationDeleteGuideArgs = {
   input: DeleteGuideInput;
+};
+
+
+export type MutationDeleteItineraryTemplateArgs = {
+  input: DeleteItineraryTemplateInput;
+};
+
+
+export type MutationUpdateItineraryTemplateArgs = {
+  input: UpdateItineraryTemplateInput;
+};
+
+
+export type MutationCreateItineraryTemplateArgs = {
+  input: CreateItineraryTemplateInput;
 };
 
 
@@ -702,6 +1046,21 @@ export type MutationCreateProvinceArgs = {
 };
 
 
+export type MutationDeleteBookingTransferArgs = {
+  input: DeleteBookingTransferInput;
+};
+
+
+export type MutationUpdateBookingTransferArgs = {
+  input: UpdateBookingTransferInput;
+};
+
+
+export type MutationCreateBookingTransferArgs = {
+  input: CreateBookingTransferInput;
+};
+
+
 export type MutationCreateTransportationRouteArgs = {
   input: CreateTransportationRouteInput;
 };
@@ -729,6 +1088,21 @@ export type MutationUpdateHouseSeasonRoomArgs = {
 
 export type MutationCreateHouseSeasonRoomArgs = {
   input: CreateHouseSeasonRoomInput;
+};
+
+
+export type MutationCreateTourArgs = {
+  input: CreateTourInput;
+};
+
+
+export type MutationUpdateTourArgs = {
+  input: UpdateTourInput;
+};
+
+
+export type MutationDeleteTourArgs = {
+  input: DeleteTourInput;
 };
 
 
@@ -781,17 +1155,12 @@ export type Notification = Node & {
   days?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
   services?: Maybe<Array<Maybe<Service>>>;
-  tourTemplateNotifications?: Maybe<NotificationConnection>;
-  notification?: Maybe<Notification>;
 };
 
 
-export type NotificationTourTemplateNotificationsArgs = {
-  page?: Maybe<Scalars['Int']>;
-  itemsPerPage?: Maybe<Scalars['Int']>;
-  order?: Maybe<Array<Maybe<NotificationFilter_Order>>>;
-  services_code?: Maybe<Scalars['String']>;
-  services_code_list?: Maybe<Array<Maybe<Scalars['String']>>>;
+export type NotificationServicesArgs = {
+  code?: Maybe<Scalars['String']>;
+  code_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 /** Connection for Notification. */
@@ -812,6 +1181,18 @@ export type NotificationPaginationInfo = {
   itemsPerPage: Scalars['Int'];
   lastPage: Scalars['Int'];
   totalCount: Scalars['Int'];
+};
+
+export type NotificationTour = Node & {
+  __typename?: 'NotificationTour';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  tour: Tour;
+  notification: Notification;
+  days: Scalars['Int'];
+  complete?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
+  icon?: Maybe<Scalars['String']>;
 };
 
 export type NotificationTourTemplate = Node & {
@@ -843,6 +1224,12 @@ export type Query = {
   node?: Maybe<Node>;
   activityCombos?: Maybe<Array<Maybe<ActivityCombo>>>;
   activityCombo?: Maybe<ActivityCombo>;
+  bookingHouse?: Maybe<BookingHouse>;
+  bookingHouses?: Maybe<Array<Maybe<BookingHouse>>>;
+  itineraryDay?: Maybe<ItineraryDay>;
+  itineraryDays?: Maybe<Array<Maybe<ItineraryDay>>>;
+  booking?: Maybe<Booking>;
+  bookings?: Maybe<Array<Maybe<Booking>>>;
   tourTemplate?: Maybe<TourTemplate>;
   tourTemplates?: Maybe<Array<Maybe<TourTemplate>>>;
   houseRoomType?: Maybe<HouseRoomType>;
@@ -854,6 +1241,8 @@ export type Query = {
   listDrivers?: Maybe<DriverConnection>;
   driver?: Maybe<Driver>;
   drivers?: Maybe<Array<Maybe<Driver>>>;
+  itinerary?: Maybe<Itinerary>;
+  itineraries?: Maybe<Array<Maybe<Itinerary>>>;
   listActivities?: Maybe<Array<Maybe<Activity>>>;
   activity?: Maybe<Activity>;
   activities?: Maybe<Array<Maybe<Activity>>>;
@@ -870,6 +1259,12 @@ export type Query = {
   destinations?: Maybe<Array<Maybe<Destination>>>;
   houseRoom?: Maybe<HouseRoom>;
   houseRooms?: Maybe<Array<Maybe<HouseRoom>>>;
+  notificationTour?: Maybe<NotificationTour>;
+  notificationTours?: Maybe<Array<Maybe<NotificationTour>>>;
+  sleepingRequirement?: Maybe<SleepingRequirement>;
+  sleepingRequirements?: Maybe<Array<Maybe<SleepingRequirement>>>;
+  bookingAccommodation?: Maybe<BookingAccommodation>;
+  bookingAccommodations?: Maybe<Array<Maybe<BookingAccommodation>>>;
   houseSeason?: Maybe<HouseSeason>;
   houseSeasons?: Maybe<Array<Maybe<HouseSeason>>>;
   listLocations?: Maybe<LocationConnection>;
@@ -877,17 +1272,29 @@ export type Query = {
   locations?: Maybe<Array<Maybe<Location>>>;
   notificationTourTemplate?: Maybe<NotificationTourTemplate>;
   notificationTourTemplates?: Maybe<Array<Maybe<NotificationTourTemplate>>>;
+  sRRoomType?: Maybe<SrRoomType>;
+  sRRoomTypes?: Maybe<Array<Maybe<SrRoomType>>>;
+  itineraryDayTemplate?: Maybe<ItineraryDayTemplate>;
+  itineraryDayTemplates?: Maybe<Array<Maybe<ItineraryDayTemplate>>>;
   listGuides?: Maybe<GuideConnection>;
   guide?: Maybe<Guide>;
   guides?: Maybe<Array<Maybe<Guide>>>;
+  itineraryTemplate?: Maybe<ItineraryTemplate>;
+  itineraryTemplates?: Maybe<Array<Maybe<ItineraryTemplate>>>;
   houseFeature?: Maybe<HouseFeature>;
   houseFeatures?: Maybe<Array<Maybe<HouseFeature>>>;
   province?: Maybe<Province>;
   provinces?: Maybe<Array<Maybe<Province>>>;
+  bookingTransfer?: Maybe<BookingTransfer>;
+  bookingTransfers?: Maybe<Array<Maybe<BookingTransfer>>>;
   transportationRoute?: Maybe<TransportationRoute>;
   transportationRoutes?: Maybe<Array<Maybe<TransportationRoute>>>;
   houseSeasonRoom?: Maybe<HouseSeasonRoom>;
   houseSeasonRooms?: Maybe<Array<Maybe<HouseSeasonRoom>>>;
+  listTours?: Maybe<Array<Maybe<Tour>>>;
+  listLsTours?: Maybe<Array<Maybe<Tour>>>;
+  tour?: Maybe<Tour>;
+  tours?: Maybe<Array<Maybe<Tour>>>;
   houseType?: Maybe<HouseType>;
   houseTypes?: Maybe<Array<Maybe<HouseType>>>;
   listNotifications?: Maybe<NotificationConnection>;
@@ -902,6 +1309,21 @@ export type QueryNodeArgs = {
 
 
 export type QueryActivityComboArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryBookingHouseArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryItineraryDayArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryBookingArgs = {
   id: Scalars['ID'];
 };
 
@@ -952,6 +1374,11 @@ export type QueryDriversArgs = {
 };
 
 
+export type QueryItineraryArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryListActivitiesArgs = {
   order?: Maybe<Array<Maybe<ActivityFilter_Order>>>;
   needle?: Maybe<Scalars['String']>;
@@ -972,6 +1399,12 @@ export type QueryActivitiesArgs = {
 
 export type QueryServiceArgs = {
   id: Scalars['ID'];
+};
+
+
+export type QueryServicesArgs = {
+  code?: Maybe<Scalars['String']>;
+  code_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -1004,6 +1437,8 @@ export type QueryHouseArgs = {
 
 export type QueryHousesArgs = {
   order?: Maybe<Array<Maybe<HouseFilter_Order>>>;
+  destination?: Maybe<Scalars['String']>;
+  destination_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
 
@@ -1028,6 +1463,27 @@ export type QueryDestinationsArgs = {
 
 
 export type QueryHouseRoomArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryNotificationTourArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QuerySleepingRequirementArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QuerySleepingRequirementsArgs = {
+  booking?: Maybe<Scalars['String']>;
+  booking_list?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+
+export type QueryBookingAccommodationArgs = {
   id: Scalars['ID'];
 };
 
@@ -1062,6 +1518,16 @@ export type QueryNotificationTourTemplateArgs = {
 };
 
 
+export type QuerySrRoomTypeArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryItineraryDayTemplateArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryListGuidesArgs = {
   page?: Maybe<Scalars['Int']>;
   itemsPerPage?: Maybe<Scalars['Int']>;
@@ -1082,6 +1548,11 @@ export type QueryGuidesArgs = {
 };
 
 
+export type QueryItineraryTemplateArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryHouseFeatureArgs = {
   id: Scalars['ID'];
 };
@@ -1092,12 +1563,44 @@ export type QueryProvinceArgs = {
 };
 
 
+export type QueryBookingTransferArgs = {
+  id: Scalars['ID'];
+};
+
+
 export type QueryTransportationRouteArgs = {
   id: Scalars['ID'];
 };
 
 
 export type QueryHouseSeasonRoomArgs = {
+  id: Scalars['ID'];
+};
+
+
+export type QueryListToursArgs = {
+  service?: Maybe<Scalars['String']>;
+  needle?: Maybe<Scalars['String']>;
+  from?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
+  notification?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  notificationComplete?: Maybe<Scalars['Boolean']>;
+  template?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryListLsToursArgs = {
+  service?: Maybe<Scalars['String']>;
+  needle?: Maybe<Scalars['String']>;
+  from?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
+  notification?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  notificationComplete?: Maybe<Scalars['Boolean']>;
+  template?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryTourArgs = {
   id: Scalars['ID'];
 };
 
@@ -1129,6 +1632,15 @@ export type QueryNotificationsArgs = {
   services_code_list?: Maybe<Array<Maybe<Scalars['String']>>>;
 };
 
+export type SrRoomType = Node & {
+  __typename?: 'SRRoomType';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  roomType?: Maybe<HouseRoomType>;
+  sleepingRequirement: SleepingRequirement;
+  rooms?: Maybe<Scalars['Int']>;
+};
+
 export type Service = Node & {
   __typename?: 'Service';
   id: Scalars['ID'];
@@ -1137,6 +1649,7 @@ export type Service = Node & {
   code?: Maybe<Scalars['String']>;
   daysToShow?: Maybe<Scalars['Int']>;
   notifications?: Maybe<Array<Maybe<Notification>>>;
+  tours?: Maybe<Array<Maybe<Tour>>>;
 };
 
 
@@ -1144,6 +1657,52 @@ export type ServiceNotificationsArgs = {
   order?: Maybe<Array<Maybe<NotificationFilter_Order>>>;
   services_code?: Maybe<Scalars['String']>;
   services_code_list?: Maybe<Array<Maybe<Scalars['String']>>>;
+};
+
+export type SleepingRequirement = Node & {
+  __typename?: 'SleepingRequirement';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  description?: Maybe<Scalars['String']>;
+  accommodationType?: Maybe<HouseType>;
+  sRRoomTypes?: Maybe<Array<Maybe<SrRoomType>>>;
+  booking?: Maybe<Booking>;
+};
+
+export type Tour = Node & {
+  __typename?: 'Tour';
+  id: Scalars['ID'];
+  _id: Scalars['Int'];
+  code?: Maybe<Scalars['String']>;
+  guideWage?: Maybe<Scalars['Float']>;
+  guide?: Maybe<Guide>;
+  color?: Maybe<Scalars['String']>;
+  startPlace?: Maybe<Scalars['String']>;
+  finishPlace?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  activities?: Maybe<Array<Maybe<Activity>>>;
+  bonus?: Maybe<Scalars['Int']>;
+  days?: Maybe<Scalars['Int']>;
+  startDay?: Maybe<Scalars['Int']>;
+  transferIn?: Maybe<Destination>;
+  transferOut?: Maybe<Destination>;
+  transportation?: Maybe<Transportation>;
+  houseType?: Maybe<HouseType>;
+  itineraries?: Maybe<Array<Maybe<Itinerary>>>;
+  notifications?: Maybe<Array<Maybe<NotificationTour>>>;
+  template?: Maybe<TourTemplate>;
+  agent?: Maybe<Scalars['Boolean']>;
+  service?: Maybe<Service>;
+  bookings?: Maybe<Array<Maybe<Booking>>>;
+  startDate?: Maybe<Scalars['String']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  name: Scalars['String'];
+  endDate?: Maybe<Scalars['String']>;
+};
+
+
+export type TourActivitiesArgs = {
+  order?: Maybe<Array<Maybe<ActivityFilter_Order>>>;
 };
 
 export type TourTemplate = Node & {
@@ -1164,12 +1723,14 @@ export type TourTemplate = Node & {
   template2?: Maybe<TourTemplate>;
   bonus?: Maybe<Scalars['Int']>;
   days?: Maybe<Scalars['Int']>;
-  startDay?: Maybe<Scalars['String']>;
+  startDay?: Maybe<Scalars['Int']>;
   transferIn?: Maybe<Destination>;
   transferOut?: Maybe<Destination>;
   transportation?: Maybe<Transportation>;
   houseType?: Maybe<HouseType>;
+  itineraries?: Maybe<Array<Maybe<ItineraryTemplate>>>;
   notifications?: Maybe<Array<Maybe<NotificationTourTemplate>>>;
+  tours?: Maybe<Array<Maybe<Tour>>>;
 };
 
 
@@ -1235,6 +1796,78 @@ export type CreateActivityInput = {
 export type CreateActivityPayload = {
   __typename?: 'createActivityPayload';
   activity?: Maybe<Activity>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingAccommodationInput = {
+  dateIn?: Maybe<Scalars['String']>;
+  dateOut?: Maybe<Scalars['String']>;
+  booking: Scalars['String'];
+  canceled?: Maybe<Scalars['Boolean']>;
+  houses?: Maybe<Array<Maybe<Scalars['String']>>>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingAccommodationPayload = {
+  __typename?: 'createBookingAccommodationPayload';
+  bookingAccommodation?: Maybe<BookingAccommodation>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingHouseInput = {
+  house?: Maybe<Scalars['String']>;
+  rooms?: Maybe<Array<Maybe<Scalars['String']>>>;
+  bookingAccommodation?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingHousePayload = {
+  __typename?: 'createBookingHousePayload';
+  bookingHouse?: Maybe<BookingHouse>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingInput = {
+  name?: Maybe<Scalars['String']>;
+  pax?: Maybe<Scalars['Int']>;
+  lp?: Maybe<Scalars['Int']>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
+  sleepingRequirement?: Maybe<Scalars['String']>;
+  bookingAccommodations?: Maybe<Array<Maybe<Scalars['String']>>>;
+  note?: Maybe<Scalars['String']>;
+  transfersIn?: Maybe<Array<Maybe<Scalars['String']>>>;
+  transfersOut?: Maybe<Array<Maybe<Scalars['String']>>>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingPayload = {
+  __typename?: 'createBookingPayload';
+  booking?: Maybe<Booking>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingTransferInput = {
+  contact?: Maybe<Scalars['String']>;
+  persons?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+  hour?: Maybe<Scalars['String']>;
+  flightData?: Maybe<Scalars['String']>;
+  destination?: Maybe<Scalars['String']>;
+  price?: Maybe<Scalars['Int']>;
+  fromHour?: Maybe<Scalars['String']>;
+  toHour?: Maybe<Scalars['String']>;
+  houses?: Maybe<Array<Maybe<Scalars['String']>>>;
+  driver?: Maybe<Scalars['String']>;
+  charge?: Maybe<Scalars['Int']>;
+  sent?: Maybe<Scalars['Boolean']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  note?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateBookingTransferPayload = {
+  __typename?: 'createBookingTransferPayload';
+  bookingTransfer?: Maybe<BookingTransfer>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1378,6 +2011,65 @@ export type CreateHouseTypePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type CreateItineraryDayInput = {
+  itinerary: Scalars['String'];
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryDayPayload = {
+  __typename?: 'createItineraryDayPayload';
+  itineraryDay?: Maybe<ItineraryDay>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryDayTemplateInput = {
+  itinerary: Scalars['String'];
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryDayTemplatePayload = {
+  __typename?: 'createItineraryDayTemplatePayload';
+  itineraryDayTemplate?: Maybe<ItineraryDayTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryInput = {
+  days: Scalars['Int'];
+  destination?: Maybe<Scalars['String']>;
+  itineraryDays?: Maybe<Array<Maybe<Scalars['String']>>>;
+  house?: Maybe<Scalars['String']>;
+  tour: Scalars['String'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryPayload = {
+  __typename?: 'createItineraryPayload';
+  itinerary?: Maybe<Itinerary>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryTemplateInput = {
+  days: Scalars['Int'];
+  destination?: Maybe<Scalars['String']>;
+  itineraryDays?: Maybe<Array<Maybe<Scalars['String']>>>;
+  house?: Maybe<Scalars['String']>;
+  tourTemplate: Scalars['String'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateItineraryTemplatePayload = {
+  __typename?: 'createItineraryTemplatePayload';
+  itineraryTemplate?: Maybe<ItineraryTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type CreateLocationDistanceInput = {
   location1: Scalars['String'];
   location2: Scalars['String'];
@@ -1408,14 +2100,26 @@ export type CreateNotificationInput = {
   days?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
   services?: Maybe<Array<Maybe<Scalars['String']>>>;
-  tourTemplateNotifications?: Maybe<Array<Maybe<Scalars['String']>>>;
-  notification?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
 export type CreateNotificationPayload = {
   __typename?: 'createNotificationPayload';
   notification?: Maybe<Notification>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateNotificationTourInput = {
+  tour: Scalars['String'];
+  notification: Scalars['String'];
+  days: Scalars['Int'];
+  complete?: Maybe<Scalars['Boolean']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateNotificationTourPayload = {
+  __typename?: 'createNotificationTourPayload';
+  notificationTour?: Maybe<NotificationTour>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1444,17 +2148,80 @@ export type CreateProvincePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type CreateSrRoomTypeInput = {
+  roomType?: Maybe<Scalars['String']>;
+  sleepingRequirement: Scalars['String'];
+  rooms?: Maybe<Scalars['Int']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateSrRoomTypePayload = {
+  __typename?: 'createSRRoomTypePayload';
+  sRRoomType?: Maybe<SrRoomType>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type CreateServiceInput = {
   name: Scalars['String'];
   code?: Maybe<Scalars['String']>;
   daysToShow?: Maybe<Scalars['Int']>;
   notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
 export type CreateServicePayload = {
   __typename?: 'createServicePayload';
   service?: Maybe<Service>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateSleepingRequirementInput = {
+  description?: Maybe<Scalars['String']>;
+  accommodationType?: Maybe<Scalars['String']>;
+  sRRoomTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
+  booking?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateSleepingRequirementPayload = {
+  __typename?: 'createSleepingRequirementPayload';
+  sleepingRequirement?: Maybe<SleepingRequirement>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateTourInput = {
+  code?: Maybe<Scalars['String']>;
+  guideWage?: Maybe<Scalars['Float']>;
+  guide?: Maybe<Scalars['String']>;
+  color?: Maybe<Scalars['String']>;
+  startPlace?: Maybe<Scalars['String']>;
+  finishPlace?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  bonus?: Maybe<Scalars['Int']>;
+  days?: Maybe<Scalars['Int']>;
+  startDay?: Maybe<Scalars['Int']>;
+  transferIn?: Maybe<Scalars['String']>;
+  transferOut?: Maybe<Scalars['String']>;
+  transportation?: Maybe<Scalars['String']>;
+  houseType?: Maybe<Scalars['String']>;
+  itineraries?: Maybe<Array<Maybe<Scalars['String']>>>;
+  notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  template?: Maybe<Scalars['String']>;
+  agent?: Maybe<Scalars['Boolean']>;
+  service?: Maybe<Scalars['String']>;
+  bookings?: Maybe<Array<Maybe<Scalars['String']>>>;
+  startDate?: Maybe<Scalars['String']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  name: Scalars['String'];
+  endDate?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type CreateTourPayload = {
+  __typename?: 'createTourPayload';
+  tour?: Maybe<Tour>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1473,13 +2240,14 @@ export type CreateTourTemplateInput = {
   template2?: Maybe<Scalars['String']>;
   bonus?: Maybe<Scalars['Int']>;
   days?: Maybe<Scalars['Int']>;
-  startDay?: Maybe<Scalars['String']>;
+  startDay?: Maybe<Scalars['Int']>;
   transferIn?: Maybe<Scalars['String']>;
   transferOut?: Maybe<Scalars['String']>;
   transportation?: Maybe<Scalars['String']>;
   houseType?: Maybe<Scalars['String']>;
   itineraries?: Maybe<Array<Maybe<Scalars['String']>>>;
   notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1550,6 +2318,50 @@ export type DeleteActivityInput = {
 export type DeleteActivityPayload = {
   __typename?: 'deleteActivityPayload';
   activity?: Maybe<Activity>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingAccommodationInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingAccommodationPayload = {
+  __typename?: 'deleteBookingAccommodationPayload';
+  bookingAccommodation?: Maybe<BookingAccommodation>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingHouseInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingHousePayload = {
+  __typename?: 'deleteBookingHousePayload';
+  bookingHouse?: Maybe<BookingHouse>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingPayload = {
+  __typename?: 'deleteBookingPayload';
+  booking?: Maybe<Booking>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingTransferInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteBookingTransferPayload = {
+  __typename?: 'deleteBookingTransferPayload';
+  bookingTransfer?: Maybe<BookingTransfer>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1663,6 +2475,50 @@ export type DeleteHouseTypePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type DeleteItineraryDayInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryDayPayload = {
+  __typename?: 'deleteItineraryDayPayload';
+  itineraryDay?: Maybe<ItineraryDay>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryDayTemplateInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryDayTemplatePayload = {
+  __typename?: 'deleteItineraryDayTemplatePayload';
+  itineraryDayTemplate?: Maybe<ItineraryDayTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryPayload = {
+  __typename?: 'deleteItineraryPayload';
+  itinerary?: Maybe<Itinerary>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryTemplateInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteItineraryTemplatePayload = {
+  __typename?: 'deleteItineraryTemplatePayload';
+  itineraryTemplate?: Maybe<ItineraryTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type DeleteLocationDistanceInput = {
   id: Scalars['ID'];
   clientMutationId?: Maybe<Scalars['String']>;
@@ -1696,6 +2552,17 @@ export type DeleteNotificationPayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type DeleteNotificationTourInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteNotificationTourPayload = {
+  __typename?: 'deleteNotificationTourPayload';
+  notificationTour?: Maybe<NotificationTour>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type DeleteNotificationTourTemplateInput = {
   id: Scalars['ID'];
   clientMutationId?: Maybe<Scalars['String']>;
@@ -1718,6 +2585,17 @@ export type DeleteProvincePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type DeleteSrRoomTypeInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteSrRoomTypePayload = {
+  __typename?: 'deleteSRRoomTypePayload';
+  sRRoomType?: Maybe<SrRoomType>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type DeleteServiceInput = {
   id: Scalars['ID'];
   clientMutationId?: Maybe<Scalars['String']>;
@@ -1726,6 +2604,28 @@ export type DeleteServiceInput = {
 export type DeleteServicePayload = {
   __typename?: 'deleteServicePayload';
   service?: Maybe<Service>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteSleepingRequirementInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteSleepingRequirementPayload = {
+  __typename?: 'deleteSleepingRequirementPayload';
+  sleepingRequirement?: Maybe<SleepingRequirement>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteTourInput = {
+  id: Scalars['ID'];
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type DeleteTourPayload = {
+  __typename?: 'deleteTourPayload';
+  tour?: Maybe<Tour>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1828,6 +2728,82 @@ export type UpdateActivityInput = {
 export type UpdateActivityPayload = {
   __typename?: 'updateActivityPayload';
   activity?: Maybe<Activity>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingAccommodationInput = {
+  id: Scalars['ID'];
+  dateIn?: Maybe<Scalars['String']>;
+  dateOut?: Maybe<Scalars['String']>;
+  booking?: Maybe<Scalars['String']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  houses?: Maybe<Array<Maybe<Scalars['String']>>>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingAccommodationPayload = {
+  __typename?: 'updateBookingAccommodationPayload';
+  bookingAccommodation?: Maybe<BookingAccommodation>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingHouseInput = {
+  id: Scalars['ID'];
+  house?: Maybe<Scalars['String']>;
+  rooms?: Maybe<Array<Maybe<Scalars['String']>>>;
+  bookingAccommodation?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingHousePayload = {
+  __typename?: 'updateBookingHousePayload';
+  bookingHouse?: Maybe<BookingHouse>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingInput = {
+  id: Scalars['ID'];
+  name?: Maybe<Scalars['String']>;
+  pax?: Maybe<Scalars['Int']>;
+  lp?: Maybe<Scalars['Int']>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
+  sleepingRequirement?: Maybe<Scalars['String']>;
+  bookingAccommodations?: Maybe<Array<Maybe<Scalars['String']>>>;
+  note?: Maybe<Scalars['String']>;
+  transfersIn?: Maybe<Array<Maybe<Scalars['String']>>>;
+  transfersOut?: Maybe<Array<Maybe<Scalars['String']>>>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingPayload = {
+  __typename?: 'updateBookingPayload';
+  booking?: Maybe<Booking>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingTransferInput = {
+  id: Scalars['ID'];
+  contact?: Maybe<Scalars['String']>;
+  persons?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+  hour?: Maybe<Scalars['String']>;
+  flightData?: Maybe<Scalars['String']>;
+  destination?: Maybe<Scalars['String']>;
+  price?: Maybe<Scalars['Int']>;
+  fromHour?: Maybe<Scalars['String']>;
+  toHour?: Maybe<Scalars['String']>;
+  houses?: Maybe<Array<Maybe<Scalars['String']>>>;
+  driver?: Maybe<Scalars['String']>;
+  charge?: Maybe<Scalars['Int']>;
+  sent?: Maybe<Scalars['Boolean']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  note?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateBookingTransferPayload = {
+  __typename?: 'updateBookingTransferPayload';
+  bookingTransfer?: Maybe<BookingTransfer>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -1981,6 +2957,69 @@ export type UpdateHouseTypePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type UpdateItineraryDayInput = {
+  id: Scalars['ID'];
+  itinerary?: Maybe<Scalars['String']>;
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+  date?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryDayPayload = {
+  __typename?: 'updateItineraryDayPayload';
+  itineraryDay?: Maybe<ItineraryDay>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryDayTemplateInput = {
+  id: Scalars['ID'];
+  itinerary?: Maybe<Scalars['String']>;
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  noGuide?: Maybe<Scalars['Boolean']>;
+  day?: Maybe<Scalars['Int']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryDayTemplatePayload = {
+  __typename?: 'updateItineraryDayTemplatePayload';
+  itineraryDayTemplate?: Maybe<ItineraryDayTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryInput = {
+  id: Scalars['ID'];
+  days?: Maybe<Scalars['Int']>;
+  destination?: Maybe<Scalars['String']>;
+  itineraryDays?: Maybe<Array<Maybe<Scalars['String']>>>;
+  house?: Maybe<Scalars['String']>;
+  tour?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryPayload = {
+  __typename?: 'updateItineraryPayload';
+  itinerary?: Maybe<Itinerary>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryTemplateInput = {
+  id: Scalars['ID'];
+  days?: Maybe<Scalars['Int']>;
+  destination?: Maybe<Scalars['String']>;
+  itineraryDays?: Maybe<Array<Maybe<Scalars['String']>>>;
+  house?: Maybe<Scalars['String']>;
+  tourTemplate?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateItineraryTemplatePayload = {
+  __typename?: 'updateItineraryTemplatePayload';
+  itineraryTemplate?: Maybe<ItineraryTemplate>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type UpdateLocationDistanceInput = {
   id: Scalars['ID'];
   location1?: Maybe<Scalars['String']>;
@@ -2014,14 +3053,27 @@ export type UpdateNotificationInput = {
   days?: Maybe<Scalars['Int']>;
   priority?: Maybe<Scalars['Int']>;
   services?: Maybe<Array<Maybe<Scalars['String']>>>;
-  tourTemplateNotifications?: Maybe<Array<Maybe<Scalars['String']>>>;
-  notification?: Maybe<Scalars['String']>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
 export type UpdateNotificationPayload = {
   __typename?: 'updateNotificationPayload';
   notification?: Maybe<Notification>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateNotificationTourInput = {
+  id: Scalars['ID'];
+  tour?: Maybe<Scalars['String']>;
+  notification?: Maybe<Scalars['String']>;
+  days?: Maybe<Scalars['Int']>;
+  complete?: Maybe<Scalars['Boolean']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateNotificationTourPayload = {
+  __typename?: 'updateNotificationTourPayload';
+  notificationTour?: Maybe<NotificationTour>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -2052,18 +3104,84 @@ export type UpdateProvincePayload = {
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
+export type UpdateSrRoomTypeInput = {
+  id: Scalars['ID'];
+  roomType?: Maybe<Scalars['String']>;
+  sleepingRequirement?: Maybe<Scalars['String']>;
+  rooms?: Maybe<Scalars['Int']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateSrRoomTypePayload = {
+  __typename?: 'updateSRRoomTypePayload';
+  sRRoomType?: Maybe<SrRoomType>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
 export type UpdateServiceInput = {
   id: Scalars['ID'];
   name?: Maybe<Scalars['String']>;
   code?: Maybe<Scalars['String']>;
   daysToShow?: Maybe<Scalars['Int']>;
   notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
 export type UpdateServicePayload = {
   __typename?: 'updateServicePayload';
   service?: Maybe<Service>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateSleepingRequirementInput = {
+  id: Scalars['ID'];
+  description?: Maybe<Scalars['String']>;
+  accommodationType?: Maybe<Scalars['String']>;
+  sRRoomTypes?: Maybe<Array<Maybe<Scalars['String']>>>;
+  booking?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateSleepingRequirementPayload = {
+  __typename?: 'updateSleepingRequirementPayload';
+  sleepingRequirement?: Maybe<SleepingRequirement>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateTourInput = {
+  id: Scalars['ID'];
+  code?: Maybe<Scalars['String']>;
+  guideWage?: Maybe<Scalars['Float']>;
+  guide?: Maybe<Scalars['String']>;
+  color?: Maybe<Scalars['String']>;
+  startPlace?: Maybe<Scalars['String']>;
+  finishPlace?: Maybe<Scalars['String']>;
+  description?: Maybe<Scalars['String']>;
+  activities?: Maybe<Array<Maybe<Scalars['String']>>>;
+  bonus?: Maybe<Scalars['Int']>;
+  days?: Maybe<Scalars['Int']>;
+  startDay?: Maybe<Scalars['Int']>;
+  transferIn?: Maybe<Scalars['String']>;
+  transferOut?: Maybe<Scalars['String']>;
+  transportation?: Maybe<Scalars['String']>;
+  houseType?: Maybe<Scalars['String']>;
+  itineraries?: Maybe<Array<Maybe<Scalars['String']>>>;
+  notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  template?: Maybe<Scalars['String']>;
+  agent?: Maybe<Scalars['Boolean']>;
+  service?: Maybe<Scalars['String']>;
+  bookings?: Maybe<Array<Maybe<Scalars['String']>>>;
+  startDate?: Maybe<Scalars['String']>;
+  canceled?: Maybe<Scalars['Boolean']>;
+  name?: Maybe<Scalars['String']>;
+  endDate?: Maybe<Scalars['String']>;
+  clientMutationId?: Maybe<Scalars['String']>;
+};
+
+export type UpdateTourPayload = {
+  __typename?: 'updateTourPayload';
+  tour?: Maybe<Tour>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 
@@ -2083,13 +3201,14 @@ export type UpdateTourTemplateInput = {
   template2?: Maybe<Scalars['String']>;
   bonus?: Maybe<Scalars['Int']>;
   days?: Maybe<Scalars['Int']>;
-  startDay?: Maybe<Scalars['String']>;
+  startDay?: Maybe<Scalars['Int']>;
   transferIn?: Maybe<Scalars['String']>;
   transferOut?: Maybe<Scalars['String']>;
   transportation?: Maybe<Scalars['String']>;
   houseType?: Maybe<Scalars['String']>;
   itineraries?: Maybe<Array<Maybe<Scalars['String']>>>;
   notifications?: Maybe<Array<Maybe<Scalars['String']>>>;
+  tours?: Maybe<Array<Maybe<Scalars['String']>>>;
   clientMutationId?: Maybe<Scalars['String']>;
 };
 

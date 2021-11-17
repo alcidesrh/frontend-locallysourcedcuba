@@ -1,0 +1,90 @@
+mutation createSleepingRequirementMutation(
+  $input: createSleepingRequirementInput!
+) {
+  createSleepingRequirement(input: $input) {
+    sleepingRequirement {
+      id
+      description
+      accommodationType {
+        id
+        name
+      }
+      sRRoomTypes {
+        id
+        rooms
+        roomType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation updateSleepingRequirementMutation(
+  $input: updateSleepingRequirementInput!
+) {
+  updateSleepingRequirement(input: $input) {
+    sleepingRequirement {
+      id
+      description
+      accommodationType {
+        id
+        name
+      }
+      sRRoomTypes {
+        id
+      }
+    }
+  }
+}
+
+mutation deleteSleepingRequirementMutation(
+  $input: deleteSleepingRequirementInput!
+) {
+  deleteSleepingRequirement(input: $input) {
+    sleepingRequirement {
+      id
+    }
+  }
+}
+
+mutation createSleepingRequirementRoomTypeMutation(
+  $input: createSRRoomTypeInput!
+) {
+  createSRRoomType(input: $input) {
+    sRRoomType {
+      id
+      roomType {
+        id
+        name
+      }
+      rooms
+    }
+  }
+}
+
+mutation updateSleepingRequirementRoomTypeMutation(
+  $input: updateSRRoomTypeInput!
+) {
+  updateSRRoomType(input: $input) {
+    sRRoomType {
+      id
+      roomType {
+        id
+        name
+      }
+      rooms
+    }
+  }
+}
+
+mutation deleteSleepingRequirementRoomTypeMutation(
+  $input: deleteSRRoomTypeInput!
+) {
+  deleteSRRoomType(input: $input) {
+    sRRoomType {
+      id
+    }
+  }
+}

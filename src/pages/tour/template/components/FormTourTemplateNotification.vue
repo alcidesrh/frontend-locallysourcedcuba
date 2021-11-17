@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
+import { defineComponent, computed, ref, inject } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { error } from 'src/helpers/notification';
 import {
@@ -12,7 +12,7 @@ import {
   listHtcTourTemplateQuery,
 } from 'src/graphql/query/tourTemplate.graphql';
 import { useNotifications } from 'src/pages/notification/notificationService';
-import useHtcTourTemplate from 'src/pages/tour/template/htc/htcTourTemplateService';
+import notificationType from 'src/pages/tour/template/components/notificationTypeService';
 import {
   NotificationTourTemplate,
   Notification,
@@ -20,16 +20,22 @@ import {
 } from 'src/graphql/@types/types';
 import { cloneDeep, pick, remove } from 'lodash-es';
 import { apolloClient } from 'src/boot/apollo';
+import { Ref } from '@vue/reactivity/dist/reactivity';
 
 export default defineComponent({
   setup() {
-    let { item, items } = useHtcTourTemplate();
+    const item = inject('item') as Ref<Partial<TourTemplate>>;
+    const items = inject('items') as Ref<Partial<TourTemplate>[]>;
+
     let {
       getNotifications,
       notifications,
       loading: loadingList,
-    } = useNotifications('HTC');
-    if (!notifications.value.length) getNotifications();
+    } = useNotifications(item.value.tourType || undefined);
+    if (notificationType.value != item.value.tourType) {
+      notificationType.value = item.value.tourType || null;
+      getNotifications();
+    }
 
     const itemNotifications: Partial<NotificationTourTemplate>[] = (cloneDeep(
       item.value.notifications
@@ -101,7 +107,9 @@ export default defineComponent({
           return (
             selection.value.filter(
               (e2: Partial<NotificationTourTemplate> | Partial<Notification>) =>
-                e2 && e2.notification?.id == e.id
+                e2 &&
+                e2.__typename == 'NotificationTourTemplate' &&
+                e2.notification?.id == e.id
             )[0] || e
           );
         })
@@ -113,6 +121,7 @@ export default defineComponent({
           loadingDelete.value ||
           loadingUpdate.value
       ),
+      loadingList,
       async onSubmit() {
         const editNotifications = selection.value.filter(
           (e) => e.__typename == 'NotificationTourTemplate'
@@ -174,28 +183,30 @@ export default defineComponent({
 
 
 <template >
-  <q-form
-    v-show="notificationsSelect.length"
-    @submit="onSubmit"
-    class="q-mt-md tw-w-full md:tw-w-3/4 md:tw-mx-auto lg:tw-w-1/2"
-  >
-    <div class="row q-col-gutter-md">
-      <div class="col-8 col-md-10"></div>
-      <div class="col-4 col-md-2 tw-flex tw-items-center">
-        <label>Days</label>
+  <q-form @submit="onSubmit" class="q-mt-md tw-w-full md:tw-w-3/4 md:tw-mx-auto lg:tw-w-1/2">
+    <div v-if="!loadingList">
+      <div class="row q-col-gutter-md">
+        <div class="col-8 col-md-10"></div>
+        <div class="col-4 col-md-2 tw-flex tw-items-center">
+          <label>Days</label>
+        </div>
       </div>
-    </div>
-    <div class="row q-col-gutter-md tw-mt-0" v-for="item in notificationsSelect" :key="item.id">
-      <div class="col-8 col-md-9 tw-flex tw-items-center">
-        <BaseCheckBox :val="item" v-model="selection">
-          <template v-slot>
-            <q-icon v-if="item.icon" :name="item.icon" class="tw-text-2xl notification-icon-color"></q-icon>
-            <label class="tw-ml-2">{{item.name}}</label>
-          </template>
-        </BaseCheckBox>
-      </div>
-      <div class="col-4 col-md-3 tw-flex tw-items-center">
-        <BaseInput v-model.number="item.days" type="number"></BaseInput>
+      <div class="row q-col-gutter-md tw-mt-0" v-for="item in notificationsSelect" :key="item.id">
+        <div class="col-8 col-md-9 tw-flex tw-items-center">
+          <BaseCheckBox :val="item" v-model="selection">
+            <template v-slot>
+              <q-icon
+                v-if="item.icon"
+                :name="item.icon"
+                class="tw-text-2xl notification-icon-color"
+              ></q-icon>
+              <label class="tw-ml-2">{{item.name}}</label>
+            </template>
+          </BaseCheckBox>
+        </div>
+        <div class="col-4 col-md-3 tw-flex tw-items-center">
+          <BaseInput v-model.number="item.days" type="number"></BaseInput>
+        </div>
       </div>
     </div>
     <div class="row q-col-gutter-md tw-mt-3">

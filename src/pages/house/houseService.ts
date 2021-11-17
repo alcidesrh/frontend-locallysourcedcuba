@@ -1,7 +1,11 @@
 import { House } from 'src/graphql/@types/types.d';
-import { listHouseQuery, getHouseQuery } from 'src/graphql/query/house.graphql';
+import {
+  listHouseQuery,
+  getHouseQuery,
+  housesQuery,
+} from 'src/graphql/query/house.graphql';
 import { error } from 'src/helpers/notification';
-import { useQuery } from '@vue/apollo-composable';
+import { useQuery, useLazyQuery } from '@vue/apollo-composable';
 import useEntityFactory from 'src/composables/useEntityFactory';
 import { ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
@@ -50,6 +54,21 @@ function list() {
   return { pagination, loading, search };
 }
 
+function getHouseByDestination() {
+  const {
+    loading,
+    onError,
+    onResult,
+    load: getHouses,
+  } = useLazyQuery(housesQuery);
+
+  onError((e) => {
+    error(e);
+  });
+
+  return { loading, getHouses, onResult };
+}
+
 function getItem(id: string) {
   const { onError, onResult } = useQuery(getHouseQuery, () => ({
     id: `/api/houses/${id}`,
@@ -73,5 +92,6 @@ export default function useHouse() {
     getItem,
     variablesListQuery,
     houseFormStep,
+    getHouseByDestination,
   };
 }

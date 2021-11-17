@@ -40,18 +40,12 @@ export default defineComponent({
 
     const destinationsSelect = ref(destinations.value);
 
-    const houseRooms = ref<Partial<HouseRoom>[]>([]);
-    const houseRoom = ref<Partial<HouseRoom>>({});
-
     const router = useRouter();
     return {
       item,
       houseTypes,
       features,
       destinationsSelect,
-      houseRoomTypes,
-      houseRoom,
-      houseRooms,
       houseFormStep,
       cancel() {
         void router.push({ name: 'ListHouse' });

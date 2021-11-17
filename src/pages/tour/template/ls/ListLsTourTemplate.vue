@@ -10,16 +10,10 @@ import {
 } from 'src/graphql/query/tourTemplate.graphql';
 import { error, success } from 'src/helpers/notification';
 import { useQuasar } from 'quasar';
-import { cloneDeep } from 'lodash-es';
 
 const columns = [
   {
     name: 'color',
-    align: 'left',
-  },
-  {
-    label: 'Type',
-    field: 'type',
     align: 'left',
   },
   {
@@ -28,29 +22,18 @@ const columns = [
     align: 'left',
   },
   {
+    label: 'Type',
+    field: 'type',
+    align: 'left',
+  },
+  {
     label: 'Code',
     field: 'code',
     align: 'left',
   },
   {
-    label: 'Start place',
-    field: 'startPlace',
-    align: 'left',
-  },
-  {
-    label: 'End place',
-    field: 'finishPlace',
-    align: 'left',
-  },
-  {
-    name: 'activities',
-    label: 'Activities',
-    align: 'left',
-  },
-  ,
-  {
-    name: 'notifications',
-    label: 'Notifications',
+    label: 'Days',
+    field: 'days',
     align: 'left',
   },
   { name: 'icon' },
@@ -109,11 +92,7 @@ export default defineComponent({
       items,
       columns,
       loading,
-      router,
-      deleteTourTemplate,
       edit(data: TourTemplate) {
-        const { item } = useTourTemplate();
-        item.value = cloneDeep(data);
         void router.push({
           name: 'EditLsTourTemplate',
           params: { id: data._id },

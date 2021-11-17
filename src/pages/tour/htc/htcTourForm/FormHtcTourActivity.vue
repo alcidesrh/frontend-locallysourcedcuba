@@ -2,50 +2,49 @@
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { error } from 'src/helpers/notification';
-import {
-  updateLsTourTemplateMutation,
-  listLsTourTemplateQuery,
-} from 'src/graphql/query/tourTemplate.graphql';
-import useLsTourTemplate from 'src/pages/tour/template/ls/lsTourTemplateService';
+import { updateHtcTourMutation } from 'src/graphql/query/tour.graphql';
+import useHtcTour from 'src/pages/tour/htc/htcTourService';
 import useActivity from 'src/pages/activity/activityService';
-import { TourTemplate } from 'src/graphql/@types/types';
+import { Activity } from 'src/graphql/@types/types';
 import { remove } from 'lodash-es';
 
 export default defineComponent({
   setup() {
-    let { items, item } = useLsTourTemplate();
+    let { item } = useHtcTour();
 
     const activitiesSelect = ref<string[]>([]);
 
     const { items: activities, list } = useActivity();
 
+    const { getActivities, loading } = list();
+
     if (!activities.value.length) {
-      const { getActivities } = list();
       getActivities();
-      watch(
-        activities,
-        () =>
-          (activitiesSelect.value =
-            item.value.activities?.map((e) => (e ? e.id : '')) || [])
-      );
-    } else
+      watch(activities, () => {
+        activitiesSelect.value =
+          item.value.activities?.map((e) => (e ? e.id : '')) || [];
+      });
+    } else {
       activitiesSelect.value =
         item.value.activities?.map((e) => (e ? e.id : '')) || [];
+    }
 
     const {
-      mutate: updateTourTemplate,
+      mutate: updateTour,
       loading: loadingUpdate,
       onError: onErrorUpdate,
-    } = useMutation(updateLsTourTemplateMutation, () => ({
-      update: (cache) => {
-        const data: {
-          tourTemplates: Partial<TourTemplate>[];
-        } | null = cache.readQuery({
-          query: listLsTourTemplateQuery,
-        });
-        if (data) {
-          items.value = data.tourTemplates;
+    } = useMutation(updateHtcTourMutation, () => ({
+      update: (
+        cache,
+        {
+          data: {
+            updateTour: {
+              tour: { activities },
+            },
+          },
         }
+      ) => {
+        item.value.activities = activities as Activity[];
       },
     }));
 
@@ -55,12 +54,12 @@ export default defineComponent({
 
     return {
       item,
-      loading: computed(() => loadingUpdate.value),
+      loading: computed(() => loadingUpdate.value || loading.value),
       activities,
       activitiesSelect,
       remove(data: Record<string, string>) {
         remove(activitiesSelect.value, (v) => v == data.value);
-        void updateTourTemplate({
+        void updateTour({
           input: {
             id: item.value.id,
             activities: activitiesSelect.value,
@@ -68,7 +67,7 @@ export default defineComponent({
         });
       },
       add(data: Record<string, string>) {
-        void updateTourTemplate({
+        void updateTour({
           input: {
             id: item.value.id,
             activities: activitiesSelect.value.concat([data.value]),

@@ -52,15 +52,21 @@ function list() {
   return { pagination, loading, search, getNotifications };
 }
 
-export function useNotifications(service = 'HTC') {
+export function useNotifications(service = 'htc') {
   const {
     load: getNotifications,
     loading,
     onError,
     onResult,
-  } = useLazyQuery(getNotificationsQuery, () => {
-    return { services_code: service };
-  });
+  } = useLazyQuery(
+    getNotificationsQuery,
+    () => {
+      return { services_code: service };
+    },
+    {
+      fetchPolicy: 'network-only',
+    }
+  );
 
   onResult((result: { data: { notifications: Partial<Notification>[] } }) => {
     notifications.value = cloneDeep(result.data.notifications);

@@ -1,0 +1,259 @@
+fragment basicListTourFragment on Tour {
+  id
+  _id
+  code
+  color
+  startDate
+  notifications {
+    id
+    icon
+    complete
+  }
+  name
+  guide {
+    name
+  }
+  canceled
+}
+
+fragment htcTourFragment on Tour {
+  id
+  _id
+  code
+  color
+  guide {
+    id
+    name
+  }
+  startPlace
+  finishPlace
+  startDate
+  agent
+  template {
+    id
+    color
+    name
+    type
+  }
+  notifications {
+    id
+    icon
+    days
+    name
+    complete
+    notification {
+      id
+    }
+  }
+  activities {
+    id
+    name
+  }
+  description
+  bookings {
+    id
+    name
+    pax
+    lp
+  }
+}
+
+query listTourQuery(
+  $service: String
+  $needle: String
+  $from: String
+  $to: String
+  $notification: [Int]
+  $notificationComplete: Boolean
+  $template: Int
+) {
+  listTours(
+    service: $service
+    needle: $needle
+    from: $from
+    to: $to
+    notification: $notification
+    notificationComplete: $notificationComplete
+    template: $template
+  ) {
+    ...basicListTourFragment
+  }
+}
+
+query getTourQuery($id: ID!) {
+  tour(id: $id) {
+    ...htcTourFragment
+  }
+}
+
+mutation createTourMutation($input: createTourInput!) {
+  createTour(input: $input) {
+    tour {
+      ...htcTourFragment
+    }
+  }
+}
+
+mutation updateHtcTourMutation($input: updateTourInput!) {
+  updateTour(input: $input) {
+    tour {
+      ...htcTourFragment
+    }
+  }
+}
+
+mutation deleteTourMutation($input: deleteTourInput!) {
+  deleteTour(input: $input) {
+    tour {
+      id
+    }
+  }
+}
+
+# Ls Tour*************************************************************************************************
+
+fragment lsTourFragment on Tour {
+  id
+  _id
+  template {
+    id
+    name
+    type
+    color
+  }
+  code
+  color
+  bonus
+  guideWage
+  days
+  startDay
+  startDate
+  endDate
+  agent
+  transferIn {
+    id
+    name
+  }
+  transferOut {
+    id
+    name
+  }
+  description
+  notifications {
+    id
+    name
+    icon
+    days
+    notification {
+      id
+    }
+  }
+  itineraries {
+    id
+    days
+    destination {
+      id
+      name
+    }
+    house {
+      id
+      name
+    }
+    itineraryDays {
+      id
+      noGuide
+      day
+      activities {
+        id
+        name
+      }
+    }
+  }
+  transportation {
+    id
+    name
+  }
+  houseType {
+    id
+    name
+  }
+  bookings {
+    id
+    name
+    pax
+    lp
+    sleepingRequirement {
+      id
+      description
+      accommodationType {
+        id
+        name
+      }
+      sRRoomTypes {
+        id
+        rooms
+        roomType {
+          id
+          name
+        }
+      }
+    }
+  }
+  guide {
+    id
+    name
+  }
+}
+
+query listLsTourQuery(
+  $service: String
+  $needle: String
+  $from: String
+  $to: String
+  $notification: [Int]
+  $notificationComplete: Boolean
+  $template: Int
+) {
+  listLsTours(
+    service: $service
+    needle: $needle
+    from: $from
+    to: $to
+    notification: $notification
+    notificationComplete: $notificationComplete
+    template: $template
+  ) {
+    ...basicListTourFragment
+    endDate
+  }
+}
+
+query getLsTourQuery($id: ID!) {
+  tour(id: $id) {
+    ...lsTourFragment
+  }
+}
+
+mutation createLsTourMutation($input: createTourInput!) {
+  createTour(input: $input) {
+    tour {
+      ...lsTourFragment
+    }
+  }
+}
+
+mutation updateLsTourMutation($input: updateTourInput!) {
+  updateTour(input: $input) {
+    tour {
+      ...lsTourFragment
+    }
+  }
+}
+
+# mutation deleteTourMutation($input: deleteTourInput!) {
+#   deleteTour(input: $input) {
+#     tour {
+#       id
+#     }
+#   }
+# }

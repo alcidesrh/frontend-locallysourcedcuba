@@ -27,7 +27,7 @@ function list() {
 }
 
 function getItem(id: string) {
-  const { onError, onResult } = useQuery(
+  const { onError, onResult, loading } = useQuery(
     getTourTemplateQuery,
     () => ({
       id: `/api/tour_templates/${id}`,
@@ -43,6 +43,8 @@ function getItem(id: string) {
   onResult((result: { data: { tourTemplate: TourTemplate } }) => {
     item.value = Object.assign({}, result.data.tourTemplate);
   });
+
+  return { loading };
 }
 
 export default function service() {

@@ -37,39 +37,40 @@ export default defineComponent({
 
     let { loading, search } = list();
 
-    const { mutate: deleteActivity, onError, onDone } = useMutation(
-      deleteActivityMutation,
-      () => ({
-        update: (
-          cache,
-          {
-            data: {
-              deleteActivity: {
-                activity: { id },
-              },
+    const {
+      mutate: deleteActivity,
+      onError,
+      onDone,
+    } = useMutation(deleteActivityMutation, () => ({
+      update: (
+        cache,
+        {
+          data: {
+            deleteActivity: {
+              activity: { id },
             },
-          }
-        ) => {
-          let data: Record<string, []> | null = cache.readQuery({
+          },
+        }
+      ) => {
+        let data: Record<string, []> | null = cache.readQuery({
+          query: listActivityQuery,
+          variables: variablesListQuery.value,
+        });
+        if (data) {
+          items.value = data.listActivities.filter(
+            (i: { id: string }) => i.id != id
+          );
+
+          cache.writeQuery({
             query: listActivityQuery,
+            data: {
+              listActivities: items.value,
+            },
             variables: variablesListQuery.value,
           });
-          if (data) {
-            items.value = data.listActivities.filter(
-              (i: { id: string }) => i.id != id
-            );
-
-            cache.writeQuery({
-              query: listActivityQuery,
-              data: {
-                listActivities: items.value,
-              },
-              variables: variablesListQuery.value,
-            });
-          }
-        },
-      })
-    );
+        }
+      },
+    }));
 
     onError((e: Error) => {
       error(e);
@@ -114,7 +115,7 @@ export default defineComponent({
 <template>
   <q-page padding>
     <q-table
-      title="Activitys"
+      title="Activities"
       :rows="items"
       :columns="columns"
       color="primary"

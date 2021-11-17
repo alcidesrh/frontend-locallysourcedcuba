@@ -1,10 +1,13 @@
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import useHtcTourTemplate from 'src/pages/tour/template/htc/htcTourTemplateService';
+import { defineComponent, computed, inject } from 'vue';
+import { Ref } from '@vue/reactivity/dist/reactivity';
+import { TourTemplate } from 'src/graphql/@types/types';
 
 export default defineComponent({
   setup() {
-    let { item, items, list } = useHtcTourTemplate();
+    const item = inject('item') as Ref<TourTemplate>;
+    const items = inject('items') as Ref<TourTemplate[]>;
+    const list = inject('list') as () => void;
 
     if (typeof item.value.description == 'undefined')
       item.value.description = null;

@@ -10,53 +10,68 @@ query getGuideQuery($id: ID!) {
   }
 }
 
-query listGuideQuery($page: Int, $itemsPerPage: Int, $order: [GuideFilter_order], $needle: String){
-  listGuides(page: $page, itemsPerPage: $itemsPerPage, order: $order, needle: $needle){
-    collection{
+query getGuidesQuery {
+  guides {
+    id
+    name
+    lastName
+  }
+}
+
+query listGuideQuery(
+  $page: Int
+  $itemsPerPage: Int
+  $order: [GuideFilter_order]
+  $needle: String
+) {
+  listGuides(
+    page: $page
+    itemsPerPage: $itemsPerPage
+    order: $order
+    needle: $needle
+  ) {
+    collection {
       id
       _id
-      name,
-      lastName      
+      name
+      lastName
       email
       phone
       bonus
     }
-    paginationInfo{
+    paginationInfo {
       totalCount
       lastPage
     }
   }
 }
 
-mutation createGuideMutation($input: createGuideInput!){
+mutation createGuideMutation($input: createGuideInput!) {
   createGuide(input: $input) {
-            guide {
-              id
-            }
-          }
-}
-
-mutation updateGuideMutation($input: updateGuideInput!){
-  updateGuide(input: $input) {
-            guide {
-              id
-              _id
-              name
-              lastName
-              email
-              phone
-              bonus
-            }
-          }
-}
-
-mutation deleteGuideMutation($input: deleteGuideInput!){
-  deleteGuide(input: $input){
-    guide{
+    guide {
       id
     }
   }
 }
 
+mutation updateGuideMutation($input: updateGuideInput!) {
+  updateGuide(input: $input) {
+    guide {
+      id
+      _id
+      name
+      lastName
+      email
+      phone
+      bonus
+    }
+  }
+}
 
-
+mutation deleteGuideMutation($input: deleteGuideInput!) {
+  deleteGuide(input: $input) {
+    guide {
+      id
+    }
+  }
+}

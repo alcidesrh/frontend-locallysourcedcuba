@@ -1,0 +1,40 @@
+fragment bookingFragment on Booking {
+  id
+  name
+  pax
+  lp
+  sleepingRequirement {
+    id
+    description
+    accommodationType {
+      id
+    }
+    sRRoomTypes {
+      id
+    }
+  }
+}
+
+mutation createBookingMutation($input: createBookingInput!) {
+  createBooking(input: $input) {
+    booking {
+      ...bookingFragment
+    }
+  }
+}
+
+mutation updateBookingMutation($input: updateBookingInput!) {
+  updateBooking(input: $input) {
+    booking {
+      ...bookingFragment
+    }
+  }
+}
+
+mutation deleteBookingMutation($input: deleteBookingInput!) {
+  deleteBooking(input: $input) {
+    booking {
+      id
+    }
+  }
+}

@@ -10,7 +10,6 @@ import {
 } from 'src/graphql/query/tourTemplate.graphql';
 import { error, success } from 'src/helpers/notification';
 import { useQuasar } from 'quasar';
-import { cloneDeep } from 'lodash-es';
 
 const columns = [
   {
@@ -18,13 +17,14 @@ const columns = [
     align: 'left',
   },
   {
-    label: 'Type',
-    field: 'type',
+    label: 'Name',
+    field: 'name',
+    name: 'name',
     align: 'left',
   },
   {
-    label: 'Name',
-    field: 'name',
+    label: 'Type',
+    field: 'type',
     align: 'left',
   },
   {
@@ -35,10 +35,12 @@ const columns = [
   {
     label: 'Start place',
     field: 'startPlace',
+    name: 'startPlace',
     align: 'left',
   },
   {
     label: 'End place',
+    name: 'finishPlace',
     field: 'finishPlace',
     align: 'left',
   },
@@ -112,8 +114,6 @@ export default defineComponent({
       router,
       deleteTourTemplate,
       edit(data: TourTemplate) {
-        const { item } = useTourTemplate();
-        item.value = cloneDeep(data);
         void router.push({
           name: 'EditHtcTourTemplate',
           params: { id: data._id },
@@ -150,17 +150,36 @@ export default defineComponent({
         <q-td key="color" :props="props" auto-width>
           <div
             class="tw-w-12"
-            style="height: 30px; width: 30px;"
-            :style="{backgroundColor: props.row.color}"
+            style="height: 33px"
+            :style="{ backgroundColor: props.row.color }"
           ></div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-name="props">
+        <q-td key="name">
+          <div class="tw-max-w-sm tw-whitespace-pre">{{ props.row.name }}</div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-startPlace="props">
+        <q-td key="startPlace">
+          <div class="tw-max-w-sm tw-whitespace-pre">
+            {{ props.row.startPlace }}
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-finishPlace="props">
+        <q-td key="finishPlace">
+          <div class="tw-max-w-sm tw-whitespace-pre">
+            {{ props.row.finishPlace }}
+          </div>
         </q-td>
       </template>
       <template v-slot:body-cell-activities="props">
         <q-td key="activities">
-          <div>
+          <div class="tw-max-h-40 tw-overflow-y-auto">
             <div
               class="tw-float-left"
-              v-for="(activity) in props.row.activities"
+              v-for="activity in props.row.activities"
               :key="activity.id"
             >
               <q-chip v-text="activity.name"></q-chip>
@@ -172,7 +191,7 @@ export default defineComponent({
         <q-td key="notifications">
           <div class="tw-flex tw-gap-2">
             <q-icon
-              v-for="(notification) in props.row.notifications"
+              v-for="notification in props.row.notifications"
               :key="notification.id"
               :name="notification.icon"
               class="tw-float-left tw-text-2xl notification-icon-color"
@@ -186,13 +205,13 @@ export default defineComponent({
             class="q-mr-sm"
             name="edit"
             color="teal"
-            style="font-size: 20px; cursor: pointer;"
+            style="font-size: 20px; cursor: pointer"
             @click="edit(props.row)"
           />
           <q-icon
             name="delete"
             color="negative"
-            style="font-size: 20px; cursor: pointer;"
+            style="font-size: 20px; cursor: pointer"
             @click="remove(props.row)"
           />
         </q-td>

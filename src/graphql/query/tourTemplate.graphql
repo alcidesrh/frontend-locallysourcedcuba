@@ -1,4 +1,4 @@
-fragment htcTourTemplateFragment on TourTemplate {
+fragment basicHtcTourTemplateFragment on TourTemplate {
   id
   _id
   name
@@ -7,7 +7,7 @@ fragment htcTourTemplateFragment on TourTemplate {
   type
   startPlace
   finishPlace
-  description
+  tourType
   notifications {
     id
     name
@@ -24,6 +24,10 @@ fragment htcTourTemplateFragment on TourTemplate {
       id
     }
   }
+}
+fragment htcTourTemplateFragment on TourTemplate {
+  ...basicHtcTourTemplateFragment
+  description
   template1 {
     id
     color
@@ -40,7 +44,7 @@ fragment htcTourTemplateFragment on TourTemplate {
 
 query listHtcTourTemplateQuery {
   tourTemplates(tourType: "htc") {
-    ...htcTourTemplateFragment
+    ...basicHtcTourTemplateFragment
   }
 }
 
@@ -75,16 +79,30 @@ mutation deleteTourTemplateMutation($input: deleteTourTemplateInput!) {
 }
 
 # Ls Tour****************************************
-
-fragment lsTourTemplateFragment on TourTemplate {
+fragment basicLsTourTemplateFragment on TourTemplate {
   id
   _id
   name
   code
   color
   type
-  startPlace
-  finishPlace
+  days
+}
+fragment lsTourTemplateFragment on TourTemplate {
+  ...basicLsTourTemplateFragment
+  bonus
+  guideWage
+  days
+  startDay
+  tourType
+  transferIn {
+    id
+    name
+  }
+  transferOut {
+    id
+    name
+  }
   description
   notifications {
     id
@@ -95,11 +113,25 @@ fragment lsTourTemplateFragment on TourTemplate {
       id
     }
   }
-  activities {
+  itineraries {
     id
-    name
+    days
     destination {
       id
+      name
+    }
+    house {
+      id
+      name
+    }
+    itineraryDays {
+      id
+      noGuide
+      day
+      activities {
+        id
+        name
+      }
     }
   }
   template1 {
@@ -114,27 +146,35 @@ fragment lsTourTemplateFragment on TourTemplate {
     type
     name
   }
+  transportation {
+    id
+    name
+  }
+  houseType {
+    id
+    name
+  }
 }
 
 query listLsTourTemplateQuery {
   tourTemplates(tourType: "ls") {
+    ...basicLsTourTemplateFragment
+  }
+}
+
+query getLsTourTemplateQuery($id: ID!) {
+  tourTemplate(id: $id) {
     ...lsTourTemplateFragment
   }
 }
 
-# query getTourTemplateQuery($id: ID!) {
-#   tourTemplate(id: $id) {
-#     ...lsTourTemplateFragment
-#   }
-# }
-
-# mutation createTourTemplateMutation($input: createTourTemplateInput!) {
-#   createTourTemplate(input: $input) {
-#     tourTemplate {
-#       ...lsTourTemplateFragment
-#     }
-#   }
-# }
+mutation createLsTourTemplateMutation($input: createTourTemplateInput!) {
+  createTourTemplate(input: $input) {
+    tourTemplate {
+      ...lsTourTemplateFragment
+    }
+  }
+}
 
 mutation updateLsTourTemplateMutation($input: updateTourTemplateInput!) {
   updateTourTemplate(input: $input) {

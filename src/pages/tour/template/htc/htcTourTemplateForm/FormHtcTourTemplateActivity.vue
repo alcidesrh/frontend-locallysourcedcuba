@@ -28,16 +28,27 @@ export default defineComponent({
           (activitiesSelect.value =
             item.value.activities?.map((e) => (e ? e.id : '')) || [])
       );
-    } else
+    } else {
       activitiesSelect.value =
         item.value.activities?.map((e) => (e ? e.id : '')) || [];
+
+      console.log(activitiesSelect.value, activities.value);
+    }
 
     const {
       mutate: updateTourTemplate,
       loading: loadingUpdate,
       onError: onErrorUpdate,
     } = useMutation(updateHtcTourTemplateMutation, () => ({
-      update: (cache) => {
+      update: (
+        cache,
+        {
+          data: {
+            updateTourTemplate: { tourTemplate },
+          },
+        }
+      ) => {
+        item.value.activities = (tourTemplate as TourTemplate).activities;
         const data: {
           tourTemplates: Partial<TourTemplate>[];
         } | null = cache.readQuery({

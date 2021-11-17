@@ -1,0 +1,124 @@
+mutation createItineraryTemplateMutation(
+  $input: createItineraryTemplateInput!
+) {
+  createItineraryTemplate(input: $input) {
+    itineraryTemplate {
+      id
+      days
+      destination {
+        id
+      }
+      house {
+        id
+      }
+    }
+  }
+}
+
+mutation updateItineraryTemplateMutation(
+  $input: updateItineraryTemplateInput!
+) {
+  updateItineraryTemplate(input: $input) {
+    itineraryTemplate {
+      days
+      destination {
+        id
+      }
+      house {
+        id
+      }
+    }
+  }
+}
+
+mutation deleteItineraryTemplateMutation(
+  $input: deleteItineraryTemplateInput!
+) {
+  deleteItineraryTemplate(input: $input) {
+    itineraryTemplate {
+      id
+    }
+  }
+}
+
+# Itinierary day template-------------------------------------
+
+mutation createItineraryDayTemplateMutation(
+  $input: createItineraryDayTemplateInput!
+) {
+  createItineraryDayTemplate(input: $input) {
+    itineraryDayTemplate {
+      id
+      activities {
+        id
+      }
+      noGuide
+      day
+    }
+  }
+}
+
+mutation updateItineraryDayTemplateMutation(
+  $input: updateItineraryDayTemplateInput!
+) {
+  updateItineraryDayTemplate(input: $input) {
+    itineraryDayTemplate {
+      id
+    }
+  }
+}
+
+# Tour----------------------------------------------------
+
+mutation createItineraryMutation($input: createItineraryInput!) {
+  createItinerary(input: $input) {
+    itinerary {
+      id
+    }
+  }
+}
+
+mutation updateItineraryMutation($input: updateItineraryInput!) {
+  updateItinerary(input: $input) {
+    itinerary {
+      days
+      destination {
+        id
+      }
+      house {
+        id
+      }
+    }
+  }
+}
+
+mutation deleteItineraryMutation($input: deleteItineraryInput!) {
+  deleteItinerary(input: $input) {
+    itinerary {
+      id
+    }
+  }
+}
+
+# Itinierary day template-------------------------------------
+
+mutation createItineraryDayMutation($input: createItineraryDayInput!) {
+  createItineraryDay(input: $input) {
+    itineraryDay {
+      id
+      activities {
+        id
+      }
+      noGuide
+      day
+    }
+  }
+}
+
+mutation updateItineraryDayMutation($input: updateItineraryDayInput!) {
+  updateItineraryDay(input: $input) {
+    itineraryDay {
+      id
+    }
+  }
+}

@@ -10,15 +10,14 @@ export default defineComponent({
 
     const route = useRoute();
 
-    if (!item.value.id && route.params.id) {
-      getItem(route.params.id as string);
-    }
+    const { loading } = getItem(route.params.id as string);
 
     tourTemplateFormStep.value = 1;
 
     const router = useRouter();
 
     return {
+      loading,
       cancel() {
         item.value = {};
         void router.push({ name: 'ListLsTourTemplate' });
@@ -30,7 +29,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <q-page padding>
+  <q-page padding :class="{'tw-opacity-50': loading}">
     <div class="tw-grid tw-grid-cols-2 tw-gap-4 tw-mb-5 tw-mt-2">
       <div class="text-subtitle1">Edit LS Tour Template</div>
       <div class="tw-flex tw-align-middle tw-justify-end">

@@ -3,7 +3,7 @@ import useHtcTourTemplate from 'src/pages/tour/template/htc/htcTourTemplateServi
 import FormTourTemplateInformation from 'src/pages/tour/template/components/FormTourTemplateInformation.vue';
 import FormTourTemplateNotification from 'src/pages/tour/template/components/FormTourTemplateNotification.vue';
 import FormHtcTourTemplateActivity from 'src/pages/tour/template/htc/htcTourTemplateForm/FormHtcTourTemplateActivity.vue';
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed, provide } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { useMutation } from '@vue/apollo-composable';
@@ -18,7 +18,11 @@ import { TourTemplate } from 'src/graphql/@types/types';
 
 export default defineComponent({
   setup() {
-    let { items, item, tourTemplateFormStep } = useHtcTourTemplate();
+    let { item, items, list, tourTemplateFormStep } = useHtcTourTemplate();
+
+    provide('item', item);
+    provide('items', items);
+    provide('list', list);
 
     tourTemplateFormStep.value = 1;
 
@@ -161,7 +165,13 @@ export default defineComponent({
       </q-stepper-navigation>
     </q-step>
 
-    <q-step :name="2" title="Notifications" icon="notifications_active" :disable="!item.id">
+    <q-step
+      :name="2"
+      title="Notifications"
+      icon="notifications_active"
+      :disable="!item.id"
+      :done="tourTemplateFormStep > 2"
+    >
       <FormTourTemplateNotification />
       <q-stepper-navigation>
         <div class="tw-grid tw-grid-cols-2 tw-gap-4 tw-mb-5 tw-mt-2">

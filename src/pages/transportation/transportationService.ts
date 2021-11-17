@@ -1,6 +1,7 @@
 import { Transportation } from 'src/graphql/@types/types.d';
 import {
   getTransportationsQuery,
+  getTransportationsSelectQuery,
   getTransportationQuery,
 } from 'src/graphql/query/transportation.graphql';
 import { error } from 'src/helpers/notification';
@@ -10,6 +11,8 @@ import { ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 const { item, items } = useEntityFactory<Partial<Transportation>>();
+
+const itemsSelect = ref<Partial<Transportation>[]>([]);
 
 const transportationFormStep = ref(1);
 
@@ -40,6 +43,28 @@ function list() {
   return { loading, getTransportations };
 }
 
+function listSelect() {
+  const { loading, onError, onResult } = useQuery(
+    getTransportationsSelectQuery
+  );
+
+  onResult(
+    (result: {
+      data: {
+        transportations: Partial<Transportation>[];
+      };
+    }) => {
+      itemsSelect.value = result.data.transportations;
+    }
+  );
+
+  onError((e) => {
+    error(e);
+  });
+
+  return { loading };
+}
+
 function getItem(id: string) {
   const { onError, onResult } = useQuery(getTransportationQuery, () => ({
     id: `/api/transportations/${id}`,
@@ -54,5 +79,13 @@ function getItem(id: string) {
 }
 
 export default function useTransportation() {
-  return { item, items, list, getItem, transportationFormStep };
+  return {
+    item,
+    items,
+    itemsSelect,
+    list,
+    listSelect,
+    getItem,
+    transportationFormStep,
+  };
 }

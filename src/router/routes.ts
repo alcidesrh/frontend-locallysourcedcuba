@@ -12,6 +12,7 @@ import locationRoutes from './location';
 import locationDistanceRoutes from './locationDistance';
 import transportationRoutes from './transportation';
 import tourTemplateRoutes from './tourTemplate';
+import tourRoutes from './tour';
 
 const routes: RouteRecordRaw[] = [
   {
@@ -34,6 +35,7 @@ const routes: RouteRecordRaw[] = [
       ...locationDistanceRoutes,
       ...transportationRoutes,
       ...tourTemplateRoutes,
+      ...tourRoutes,
     ],
   },
 

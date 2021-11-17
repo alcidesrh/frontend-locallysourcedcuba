@@ -19,6 +19,7 @@ query getNotificationsQuery($services_code: String!) {
     name
     icon
     days
+    _id
   }
 }
 
@@ -129,6 +130,58 @@ mutation deleteNotificationTourTemplateMutation(
 ) {
   deleteNotificationTourTemplate(input: $input) {
     notificationTourTemplate {
+      id
+    }
+  }
+}
+
+mutation createNotificationTourMutation($input: createNotificationTourInput!) {
+  createNotificationTour(input: $input) {
+    notificationTour {
+      id
+      days
+      name
+      icon
+      notification {
+        id
+      }
+      tour {
+        id
+        notifications {
+          id
+          icon
+          complete
+        }
+      }
+    }
+  }
+}
+
+mutation updateNotificationTourMutation($input: updateNotificationTourInput!) {
+  updateNotificationTour(input: $input) {
+    notificationTour {
+      id
+      name
+      icon
+      days
+      notification {
+        id
+      }
+      tour {
+        id
+        notifications {
+          id
+          icon
+          complete
+        }
+      }
+    }
+  }
+}
+
+mutation deleteNotificationTourMutation($input: deleteNotificationTourInput!) {
+  deleteNotificationTour(input: $input) {
+    notificationTour {
       id
     }
   }

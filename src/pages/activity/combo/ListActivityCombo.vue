@@ -182,7 +182,8 @@ export default defineComponent({
         <q-td key="activities" :props="props">
           <div class="tw-grid tw-grid-cols-1 tw-gap-4"></div>
           <div v-for="(activity, index) in props.row.activities" :key="activity.id">
-            <q-icon
+            <span v-if="props.row.activities.length > 1">
+              <q-icon
               class="q-mr-sm"
               name="arrow_upward"
               :color="loadingPriority || index == 0 ? 'grey' : 'orange'"
@@ -196,6 +197,7 @@ export default defineComponent({
               style="font-size: 20px; cursor: pointer;"
               @click="() => loadingPriority || index == props.row.activities.length - 1 || priority(activity.id, true)"
             />
+            </span>
             <q-chip removable @remove="removeActivityCombo(activity.id)">{{activity.activity.name}}</q-chip>
           </div>
         </q-td>

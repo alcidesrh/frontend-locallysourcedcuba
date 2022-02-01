@@ -27,7 +27,7 @@ export default defineComponent({
       getNotifications,
       notifications,
       loading: loadingList,
-    } = useNotifications(service.value.code || undefined);
+    } = useNotifications();
 
     const loadingCrud = ref(false);
 
@@ -110,7 +110,7 @@ export default defineComponent({
       notificationType.value != service.value.code
     ) {
       notificationType.value = service.value.code || null;
-      getNotifications();
+      getNotifications(service.value.code as string);
     }
     const itemNotifications: Partial<NotificationTour>[] = (cloneDeep(
       item.value.notifications

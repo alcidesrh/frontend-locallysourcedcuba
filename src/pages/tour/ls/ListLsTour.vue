@@ -12,26 +12,57 @@ import { error, success } from 'src/helpers/notification';
 import { useQuasar } from 'quasar';
 import dayjs from 'dayjs';
 import SearchTour from 'src/pages/tour/components/SearchTour.vue';
+import PendingNotificationTour from 'src/pages/tour/components/PendingNotificationTour.vue';
 import useService from 'src/pages/service/serviceService';
+import tourService from 'src/pages/tour/tourService';
 import ShowLsTour from 'src/pages/tour/ls/ShowLsTour.vue';
 import gql from 'graphql-tag';
 import globalLoading from 'src/store/loading';
 import { apolloClient } from 'src/boot/apollo';
+import { useNotifications } from 'src/pages/notification/notificationService';
 
 export default defineComponent({
   components: {
     SearchTour,
     ShowLsTour,
+    PendingNotificationTour,
   },
   setup() {
     const router = useRouter();
     const $q = useQuasar();
 
-    const { getServiceInUse, service } = useService();
+    const { notifications } = useNotifications();
 
-    if (service.value.code != 'ls') {
-      getServiceInUse('ls');
-    }
+    const { getNotificationsTour, pendingNotifications } = tourService();
+
+    const {
+      getPendingNotifications,
+      onResult: onResultGetPendingNotificationTour,
+    } = getNotificationsTour();
+
+    onResultGetPendingNotificationTour(
+      (result: {
+        data: {
+          notifications_tour_incompleteNotificationTours: Partial<NotificationTour>[];
+        };
+      }) => {
+        pendingNotifications.value =
+          result.data.notifications_tour_incompleteNotificationTours;
+        console.log(pendingNotifications.value);
+      }
+    );
+
+    const { setServiceInUse, service } = useService();
+
+    watch(
+      () => service.value.code,
+      () => {
+        getPendingNotifications();
+      }
+    );
+
+    const { getService, loading: loadingService } = setServiceInUse();
+    getService('ls');
 
     provide('service', service);
 
@@ -158,6 +189,9 @@ export default defineComponent({
       service,
       tours,
       loadingList,
+      loadingService,
+      notifications,
+      pendingNotifications,
       edit(data: Tour) {
         void router.push({
           name: 'EditLsTour',
@@ -198,7 +232,14 @@ export default defineComponent({
         }
 
         return (
-          '<span class="tw-text-gray-500">From</span> ' +
+          '<span class="tw-text-gray-500">Showing </span> ' +
+          `${
+            dayjs(search.value.to || new Date()).diff(
+              search.value.from || new Date(),
+              'day'
+            ) || (service.value.daysToShow as number)
+          }` +
+          '<span class="tw-text-gray-500"> days. From</span> ' +
           from +
           ' <span class="tw-text-gray-500">to</span> ' +
           to
@@ -222,8 +263,8 @@ export default defineComponent({
 <template>
   <q-page padding>
     <q-card class="tw-mt-0 tw-flex tw-items-center tw-p-5">
-      <div class="row tw-w-full">
-        <div class="col-12 tw-flex tw-items-center tw-justify-end tw-5 tw-md-0">
+      <div class="row tw-w-full" v-if="!loadingService">
+        <div class="col-12 tw-flex tw-items-center tw-justify-between tw-mb-5 tw-md-0">
           <BaseButton
             round
             icon="add"
@@ -232,9 +273,17 @@ export default defineComponent({
             class="q-ml-sm"
             @click="$router.push({name: 'CreateLsTour'})"
           />
+          <div>
+            <PendingNotificationTour
+              :key="notifications.length"
+              :notifications="notifications"
+              :pending-notifications="pendingNotifications"
+              edit-route="EditLsTour"
+            />
+          </div>
         </div>
         <div class="col-12">
-          <SearchTour v-if="service.code" />
+          <SearchTour v-if="service.code == 'ls'" />
         </div>
       </div>
     </q-card>
@@ -274,7 +323,7 @@ export default defineComponent({
                             @click.stop="updateNotification(n)"
                             style="border-radius: 50px; font-size: 15px;"
                             class="tw-mx-1 tw-bg-gray-100 tw-p-1 tw-cursor-pointer"
-                            :class="{'tw-text-gray-700': !n.complete, 'text-green': n.complete}"
+                            :class="{'tw-text-gray-500': !n.complete, 'text-teal': n.complete}"
                             v-for="(n, index) in tour.notifications"
                             :key="index"
                             :name="n.icon"
@@ -282,7 +331,7 @@ export default defineComponent({
                         </span>
 
                         <span
-                          class="tw-ml-5 tw-bg-gray-700 tw-tracking-widest"
+                          class="tw-ml-5 tw-bg-white tw-tracking-widest"
                           style="border-radius: 50px; padding: 0px 10px;"
                         >
                           <q-icon

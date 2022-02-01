@@ -2,30 +2,69 @@
 import { defineComponent, inject, ref, watch } from 'vue';
 import { Ref } from '@vue/reactivity/dist/reactivity';
 import { Booking, Tour } from 'src/graphql/@types/types';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useQuery, useApolloClient } from '@vue/apollo-composable';
 import {
-  createBookingMutation,
-  updateBookingMutation,
+  bookingHtcQuery,
+  createBookingHtcMutation,
+  updateBookingHtcMutation,
   deleteBookingMutation,
 } from 'src/graphql/query/booking.graphql';
 import { error } from 'src/helpers/notification';
 import globalLoading from 'src/store/loading';
+import { cloneDeep } from 'lodash-es';
 
 export default defineComponent({
   setup() {
     const item = inject('item') as Ref<Tour>;
     const newBooking = ref<Partial<Booking>>({});
-    const bookings = ref<Partial<Booking>[]>(
-      (item.value.bookings as Partial<Booking>[]) || []
-    );
+    const bookings = ref<Partial<Booking>[]>([]);
     const index = ref(-1);
     const formRef = ref<Record<string, () => void>>({});
+
+    const { client } = useApolloClient();
+    const result = client.cache.readQuery({
+      query: bookingHtcQuery,
+      variables: {
+        tourID: item.value.id,
+      },
+    });
+
+    if (result) {
+      bookings.value = cloneDeep(
+        (result as Record<'bookings', Booking[]>).bookings
+      );
+    } else {
+      globalLoading.value = true;
+      const { onError, onResult } = useQuery(bookingHtcQuery, () => ({
+        tourID: item.value.id,
+      }));
+      onError((e: Error) => {
+        error(e);
+      });
+
+      onResult((result: { data: { bookings: Booking[] } }) => {
+        bookings.value = cloneDeep(result.data.bookings);
+        globalLoading.value = false;
+      });
+    }
+
+    function writeCache() {
+      client.cache.writeQuery({
+        query: bookingHtcQuery,
+        data: {
+          bookings: bookings.value,
+        },
+        variables: {
+          tourID: item.value.id,
+        },
+      });
+    }
 
     const {
       mutate: createBooking,
       loading: loadingCreate,
       onError: onErrorCreate,
-    } = useMutation(createBookingMutation, () => ({
+    } = useMutation(createBookingHtcMutation, () => ({
       update: (
         cache,
         {
@@ -38,6 +77,7 @@ export default defineComponent({
         bookings.value.push(booking);
         newBooking.value = {};
         formRef.value.resetValidation();
+        writeCache();
       },
     }));
     onErrorCreate((e: Error) => {
@@ -48,7 +88,7 @@ export default defineComponent({
       mutate: updateBooking,
       loading: loadingUpdate,
       onError: onErrorUpdate,
-    } = useMutation(updateBookingMutation, () => ({
+    } = useMutation(updateBookingHtcMutation, () => ({
       update: (
         cache,
         {
@@ -60,6 +100,7 @@ export default defineComponent({
         if (bookings.value) bookings.value[index.value] = booking as Booking;
         newBooking.value = {};
         formRef.value.resetValidation();
+        writeCache();
       },
     }));
     onErrorUpdate((e: Error) => {
@@ -82,9 +123,10 @@ export default defineComponent({
         }
       ) => {
         if (bookings.value) {
-          item.value.bookings = bookings.value = (
-            bookings.value as Booking[]
-          ).filter((r: Booking) => r.id != id);
+          bookings.value = (bookings.value as Booking[]).filter(
+            (r: Booking) => r.id != id
+          );
+          writeCache();
         }
       },
     }));
@@ -104,7 +146,7 @@ export default defineComponent({
       onSubmit() {
         if (!newBooking.value?.id) {
           void createBooking({
-            input: { ...newBooking.value, tours: [item.value.id] },
+            input: { ...newBooking.value, tour: item.value.id },
           });
         } else {
           void updateBooking({ input: newBooking.value });

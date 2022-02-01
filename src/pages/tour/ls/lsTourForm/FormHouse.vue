@@ -1,26 +1,27 @@
 <script lang="ts">
-import { defineComponent, inject, ref, watch } from 'vue';
+import { defineComponent, inject, ref } from 'vue';
 import { Ref } from '@vue/reactivity/dist/reactivity';
 import {
   Booking,
   BookingAccommodation,
   BookingHouse,
+  BookingHouseRoom,
   House,
   HouseRoom,
-  HouseRoomType,
-  SleepingRequirement,
-  SrRoomType,
   Tour,
 } from 'src/graphql/@types/types';
-import { useMutation } from '@vue/apollo-composable';
-import { housesQuery } from 'src/graphql/query/house.graphql';
-import { updateBookingMutation } from 'src/graphql/query/booking.graphql';
-import { error } from 'src/helpers/notification';
+import {
+  bookingQuery,
+  createBookingHouseMutation,
+  deleteBookingHouseMutation,
+  createBookingHouseRoomMutation,
+  deleteBookingHouseRoomMutation,
+  updateBookingHouseRoomMutation,
+} from 'src/graphql/query/booking.graphql';
 import useHouseRoomType from 'src/pages/house/houseRoomTypeService';
-import useHouse from 'src/pages/house/houseService';
 import { apolloClient } from 'src/boot/apollo';
-import { omit } from 'lodash-es';
-// import itinerariesDays from 'src/store/generic';
+import { cloneDeep } from 'lodash-es';
+
 import gql from 'graphql-tag';
 
 export default defineComponent({
@@ -34,7 +35,9 @@ export default defineComponent({
     const booking = props.booking as Booking;
 
     const houseDialog = ref(true);
-    const name = booking.name as string;
+    const loading = ref(false);
+    const newRoom = ref<Partial<HouseRoom>>({});
+    const recentBookingHouse = ref<string>('');
 
     const itinerariesDays = props.itinerariesDaysProp as Array<
       Record<string, Record<string, unknown>>
@@ -54,6 +57,7 @@ export default defineComponent({
       useHouseRoomType();
     if (!houseRoomTypes.value.length) houseRoomTypesList();
 
+    loading.value = true;
     const houses = ref<Array<House>>();
     void apolloClient
       .query({
@@ -65,156 +69,269 @@ export default defineComponent({
               destination {
                 id
               }
+              rooms {
+                id
+                price
+                cant
+                roomType {
+                  id
+                  name
+                }
+              }
             }
           }
         `,
       })
-      .then(
-        (resp: { data: { houses: Array<House> } }) =>
-          (houses.value = resp.data.houses)
+      .then((resp: { data: { houses: Array<House> } }) => {
+        houses.value = resp.data.houses;
+        loading.value = false;
+      });
+
+    function updateCache() {
+      const result = cloneDeep(
+        apolloClient.cache.readQuery({
+          query: bookingQuery,
+          variables: {
+            tourID: tour.value.id,
+          },
+        }) as Record<string, Booking[]>
       );
 
-    // const {
-    //   mutate: createSleepingRequirement,
-    //   loading: loadingCreate,
-    //   onError: onErrorCreate,
-    // } = useMutation(createSleepingRequirementMutation, () => ({
-    //   update: async (
-    //     cache,
-    //     {
-    //       data: {
-    //         createSleepingRequirement: { sleepingRequirement },
-    //       },
-    //     }
-    //   ) => {
-    // loading.value = true;
-    // const bookingIndex = tour.value.bookings?.indexOf(booking) as number;
-    // void apolloClient.mutate({
-    //   mutation: updateBookingMutation,
-    //   variables: {
-    //     input: {
-    //       id: sr.value.booking,
-    //       sleepingRequirement: sr.value.id,
-    //     },
-    //   },
-    // });
-    // for (let index = 0, data = {}; index < rooms.value.length; index++) {
-    //   data = {
-    //     sleepingRequirement: sr.value.id,
-    //     rooms: rooms.value[index].rooms,
-    //     roomType: rooms.value[index].roomType?.id,
-    //   };
-    //   await apolloClient
-    //     .mutate({
-    //       mutation: createSleepingRequirementRoomTypeMutation,
-    //       variables: {
-    //         input: data,
-    //       },
-    //     })
-    //     .then(
-    //       ({
-    //         data: {
-    //           createSRRoomType: { sRRoomType },
-    //         },
-    //       }) => {
-    //         if (tour.value.bookings)
-    //           (
-    //             tour.value.bookings[bookingIndex] as Booking
-    //           ).sleepingRequirement?.sRRoomTypes?.push(
-    //             sRRoomType as SrRoomType
-    //           );
-    //       }
-    //     );
-    // }
-    // loading.value = false;
-    //   },
-    // }));
-    // onErrorCreate((e: Error) => {
-    //   error(e);
-    // });
+      const index = result.bookings.indexOf(
+        result.bookings.find((e) => e.id == booking.id) as Booking
+      );
+      result.bookings[index] = booking;
 
-    // const {
-    //   mutate: updateSleepingRequirement,
-    //   loading: loadingUpdate,
-    //   onError: onErrorUpdate,
-    // } = useMutation(updateSleepingRequirementMutation, () => ({
-    //   update: (
-    //     cache,
-    //     {
-    //       data: {
-    //         updateSleepingRequirement: { sleepingRequirement },
-    //       },
-    //     }
-    //   ) => {
-    //     sr.value = {
-    //       booking: sr.value.booking,
-    //       ...(sleepingRequirement as SleepingRequirement),
-    //     };
-    //   },
-    // }));
-    // onErrorUpdate((e: Error) => {
-    //   error(e);
-    // });
+      apolloClient.cache.writeQuery({
+        query: bookingQuery,
+        data: {
+          bookings: result.bookings,
+        },
+        variables: { tourID: tour.value.id },
+      });
+    }
 
-    // watch(
-    //   [loadingCreate, loadingUpdate],
-    //   ([v, v2]) => (loading.value = v || v2)
-    // );
     return {
       itinerariesDays,
       itinerariesDaysHouse,
       bookingAccommodation,
-      // loading,
+      loading,
       houseDialog,
       houseRoomTypes,
       houses,
-      name,
-      async save() {
-        // const data = omit(
-        //   {
-        //     ...sr.value,
-        //     accommodationType: sr.value.accommodationType?.id,
-        //   },
-        //   ['booking', 'sRRoomTypes']
-        // );
-        // if (!sr.value.id) {
-        //   void createSleepingRequirement({ input: data });
-        // } else {
-        //   loading.value = true;
-        //   for (let index = 0; index < rooms.value.length; index++) {
-        //     if (!rooms.value[index].id)
-        //       await apolloClient.mutate({
-        //         mutation: createSleepingRequirementRoomTypeMutation,
-        //         variables: {
-        //           input: {
-        //             sleepingRequirement: sr.value.id,
-        //             rooms: rooms.value[index].rooms,
-        //             roomType: rooms.value[index].roomType?.id,
-        //           },
-        //         },
-        //       });
-        //   }
-        //   loading.value = false;
-        //   void updateSleepingRequirement({ input: data });
-        // }
-      },
-      addHouse(index: number) {
-        if (!bookingAccommodation.value[index]) {
-          bookingAccommodation.value[index] = {
-            houses: [],
-            booking: booking.id as unknown as Booking,
-          };
+      newRoom,
+      recentBookingHouse,
+      async addBookingHouse(index: number) {
+        loading.value = true;
+        booking.bookingAccommodations;
+        //Create booking house
+        let bookingHouse: Partial<BookingHouse> = {};
+        await apolloClient
+          .mutate({
+            mutation: createBookingHouseMutation,
+            variables: {
+              input: {
+                house: (itinerariesDaysHouse.value[index] as House).id,
+                bookingAccommodation: bookingAccommodation.value[index].id,
+              },
+            },
+          })
+          .then(
+            ({
+              data: {
+                createBookingHouse: { bookingHouse: bookingHouseCreated },
+              },
+            }) => {
+              bookingHouse = bookingHouseCreated as Partial<BookingHouse>;
+              recentBookingHouse.value = bookingHouse.id as string;
+            }
+          );
+        //Create booking house rooms
+        if (booking.sleepingRequirement?.sRRoomTypes) {
+          let houseRooms: Partial<HouseRoom[]> = [];
+          booking.sleepingRequirement?.sRRoomTypes.filter((r) => {
+            const rooms = (
+              itinerariesDaysHouse.value[index] as House
+            ).rooms?.filter((r2) => r2 && r2.roomType.id == r?.roomType?.id);
+            if (rooms?.length)
+              houseRooms = [
+                ...houseRooms,
+                ...[rooms[0]].map((r2) => {
+                  return {
+                    ...r2,
+                    cant: r?.cant,
+                  };
+                }),
+              ] as Array<HouseRoom>;
+          });
+
+          for (let i = 0; i < houseRooms.length; i++) {
+            const r = houseRooms[i] as HouseRoom;
+            await apolloClient
+              .mutate({
+                mutation: createBookingHouseRoomMutation,
+                variables: {
+                  input: {
+                    bookingHouse: bookingHouse.id,
+                    houseRoom: r.id,
+                    price: r.price,
+                    cant: booking.sleepingRequirement?.sRRoomTypes?.find(
+                      (e) => r?.roomType.id == e?.roomType?.id
+                    )?.cant,
+                  },
+                },
+              })
+              .then(
+                ({
+                  data: {
+                    createBookingHouseRoom: { bookingHouseRoom },
+                  },
+                }) => {
+                  if (!bookingHouse.bookingHouseRooms)
+                    bookingHouse.bookingHouseRooms = [];
+                  bookingHouse.bookingHouseRooms.push(bookingHouseRoom);
+                }
+              );
+          }
         }
-        if (booking.sleepingRequirement?.sRRoomTypes)
-          bookingAccommodation.value[index].houses?.push({
-            house: itinerariesDaysHouse.value[index] as House,
-            rooms: [] as Array<HouseRoom>,
-          } as BookingHouse);
+        bookingAccommodation.value[index].houses?.push(
+          bookingHouse as BookingHouse
+        );
+
+        booking.bookingAccommodations =
+          bookingAccommodation.value as BookingAccommodation[];
+
+        updateCache();
 
         itinerariesDaysHouse.value[index] = null;
+
+        loading.value = false;
       },
-      removeHouse(index: number, index2: number) {
-        (bookingAccommodation.value[index].houses as []).splice(index2, 1);
+      async removeBookingHouse(h: BookingHouse, index: number, index2: number) {
+        loading.value = true;
+        await apolloClient
+          .mutate({
+            mutation: deleteBookingHouseMutation,
+            variables: {
+              input: { id: h.id },
+            },
+          })
+          .then(() => {
+            (bookingAccommodation.value[index].houses as []).splice(index2, 1);
+            booking.bookingAccommodations =
+              bookingAccommodation.value as BookingAccommodation[];
+            updateCache();
+          });
+        loading.value = false;
+      },
+      async addBookingHouseRoom(
+        r: Record<string, unknown>,
+        index: number,
+        index2: number
+      ) {
+        loading.value = true;
+        await apolloClient
+          .mutate({
+            mutation: createBookingHouseRoomMutation,
+            variables: {
+              input: {
+                bookingHouse: (
+                  (bookingAccommodation.value[index].houses as [])[
+                    index2
+                  ] as BookingHouse
+                ).id,
+                houseRoom: (r.houseRoom as Record<string, unknown>)?.id,
+                price: r?.price ?? null,
+                cant: r?.cant ?? null,
+              },
+            },
+          })
+          .then(
+            ({
+              data: {
+                createBookingHouseRoom: { bookingHouseRoom },
+              },
+            }) => {
+              (
+                (
+                  (bookingAccommodation.value[index].houses as [])[
+                    index2
+                  ] as BookingHouse
+                ).bookingHouseRooms as Array<BookingHouseRoom>
+              ).push(bookingHouseRoom as BookingHouseRoom);
+              booking.bookingAccommodations =
+                bookingAccommodation.value as BookingAccommodation[];
+              updateCache();
+              newRoom.value = {};
+            }
+          );
+        loading.value = false;
+      },
+      async updateBookingHouseRoom(
+        r: BookingHouseRoom,
+        index: number,
+        index2: number,
+        index3: number
+      ) {
+        loading.value = true;
+        await apolloClient
+          .mutate({
+            mutation: updateBookingHouseRoomMutation,
+            variables: {
+              input: {
+                id: r.id,
+                price: r.price,
+                cant: r.cant,
+              },
+            },
+          })
+          .then(
+            ({
+              data: {
+                updateBookingHouseRoom: { bookingHouseRoom },
+              },
+            }) => {
+              (
+                (
+                  (bookingAccommodation.value[index].houses as [])[
+                    index2
+                  ] as BookingHouse
+                ).bookingHouseRooms as Array<BookingHouseRoom>
+              )[index3] = bookingHouseRoom as BookingHouseRoom;
+              booking.bookingAccommodations =
+                bookingAccommodation.value as BookingAccommodation[];
+              updateCache();
+            }
+          );
+        loading.value = false;
+      },
+      async removeBookingHouseRoom(
+        rooms: BookingHouseRoom[],
+        index: number,
+        index2: number,
+        index3: number
+      ) {
+        loading.value = true;
+        await apolloClient
+          .mutate({
+            mutation: deleteBookingHouseRoomMutation,
+            variables: {
+              input: { id: rooms[index3].id },
+            },
+          })
+          .then(() => {
+            (
+              (
+                (bookingAccommodation.value[index].houses as [])[
+                  index2
+                ] as BookingHouse
+              ).bookingHouseRooms as []
+            ).splice(index3, 1);
+            booking.bookingAccommodations =
+              bookingAccommodation.value as BookingAccommodation[];
+            updateCache();
+          });
+        loading.value = false;
       },
     };
   },
@@ -224,14 +341,26 @@ export default defineComponent({
 <template >
   <q-dialog v-model="houseDialog">
     <q-card style="width: 100%; max-width: 900px">
-      <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">Accomodation for {{name}}</div>
-        <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+      <BaseLoading :showing="loading" />
+      <q-card-section class="row items-center tw-py-3 bg-primary tw-mb-7">
+        <div class="tw-relative tw-w-full">
+          <div
+            class="text-h6 tw-text-white tw-pr-5"
+          >Booking: {{booking.name}}. Pax number: {{booking.pax}}</div>
+          <q-btn
+            class="tw-absolute tw-top-0 tw-right-0 tw--mr-3 tw--mt-2"
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+            color="white"
+          />
+        </div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-form class="q-mt-md">
+        <q-form class="q-mt-md" :class="{'tw-opacity-50': loading}">
           <div
             class="row q-col-gutter-sm tw-mb-3"
             v-for="(e, index) in itinerariesDays"
@@ -261,7 +390,7 @@ export default defineComponent({
                 icon="add"
                 class="tw-ml-2"
                 size="sm"
-                @click="addHouse(index)"
+                @click="addBookingHouse(index)"
               />
             </div>
 
@@ -280,14 +409,14 @@ export default defineComponent({
                     header-class="bg-teal text-white"
                     expand-icon-class="text-white"
                     group="somegroup"
-                    :default-opened="e && !e.id"
+                    :default-opened="e && e.id == recentBookingHouse"
                   >
                     <template v-slot:header>
                       <q-item-section>{{e?.house?.name}}</q-item-section>
 
                       <q-item-section side>
                         <q-icon
-                          @click.stop="removeHouse(index, index2)"
+                          @click.stop="removeBookingHouse(e, index, index2)"
                           name="delete"
                           color="negative"
                           style="font-size: 20px; cursor: pointer"
@@ -300,25 +429,63 @@ export default defineComponent({
                         <div class="tw-flex tw-items-center">
                           <div style="width: 300px">
                             <BaseSelect
-                              :options="houseRoomTypes"
+                              :options="houses ? houses.find(h => h.id == e.house.id).rooms.map(r => {return {id: r.id, name: r.roomType.name}}).filter((item, index, self) => {return self.indexOf(self.find(item2 => item2.name == item.name)) == index;}) : []"
                               label="Room type"
                               option-label="name"
+                              v-model="newRoom.houseRoom"
                             ></BaseSelect>
                           </div>
                           <div class="tw-mx-2" style="max-width: 60px;">
-                            <BaseInput v-model.number="newBooking" label="#" type="number"></BaseInput>
+                            <BaseInput v-model.number="newRoom.cant" label="#" type="number"></BaseInput>
                           </div>
                           <div style="max-width: 90px;">
-                            <BaseInput v-model.number="newBooking" label="Price" type="number"></BaseInput>
+                            <BaseInput v-model.number="newRoom.price" label="Price" type="number"></BaseInput>
                           </div>
                           <div>
                             <q-btn
                               round
                               color="primary"
                               icon="add"
-                              class="tw-ml-2"
+                              class="tw-mx-2"
                               size="sm"
-                              @click="addHouse(index)"
+                              @click="addBookingHouseRoom(newRoom, index, index2)"
+                            />
+                          </div>
+                        </div>
+
+                        <div
+                          class="tw-flex tw-items-center tw-mt-2"
+                          v-for="(r, indexR) in e.bookingHouseRooms"
+                          :key="indexR"
+                        >
+                          <div style="width: 300px">
+                            <BaseInput
+                              v-model="r.houseRoom.roomType.name"
+                              label="Room type"
+                              type="text"
+                              readonly
+                            ></BaseInput>
+                          </div>
+                          <div class="tw-mx-2" style="max-width: 60px;">
+                            <BaseInput v-model.number="r.cant" label="#" type="number"></BaseInput>
+                          </div>
+                          <div style="max-width: 90px;">
+                            <BaseInput v-model.number="r.price" label="Price" type="number"></BaseInput>
+                          </div>
+                          <div class="tw-flex">
+                            <q-icon
+                              class="tw-ml-1"
+                              name="save"
+                              color="teal"
+                              style="font-size: 19px; cursor: pointer"
+                              @click="updateBookingHouseRoom(r, index, index2, indexR)"
+                            />
+                            <q-icon
+                              class="tw-ml-1"
+                              name="delete"
+                              color="negative"
+                              style="font-size: 19px; cursor: pointer"
+                              @click="removeBookingHouseRoom(e.bookingHouseRooms, index, index2, indexR)"
                             />
                           </div>
                         </div>
@@ -337,18 +504,6 @@ export default defineComponent({
           <div class="flex justify-end q-mt-lg"></div>
         </q-form>
       </q-card-section>
-
-      <q-card-actions align="right">
-        <BaseButton
-          @click="save"
-          label="Cancel"
-          type="button"
-          color="primary"
-          class="q-ml-sm"
-          v-close-popup
-        />
-        <BaseButton @click="save" label="Save" type="button" color="primary" class="q-ml-sm" />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>

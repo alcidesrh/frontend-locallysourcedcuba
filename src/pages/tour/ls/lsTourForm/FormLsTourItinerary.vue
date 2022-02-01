@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
+import { defineComponent, ref, watch } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { error } from 'src/helpers/notification';
 import {
@@ -238,7 +238,6 @@ export default defineComponent({
           void updateItinerary(param);
         } else void createItinerary(param);
       },
-      cloneDeep,
       remove(data: Partial<Itinerary>) {
         $q.dialog({
           title: 'Confirm',
@@ -331,13 +330,6 @@ export default defineComponent({
               <div class="col-4 col-md-3 tw-flex tw-items-center">{{item.destination?.name}}</div>
               <div class="col-4 col-md-3 tw-flex tw-items-center">{{item.house?.name}}</div>
               <div class="col-2 tw-whitespace-nowrap tw-flex tw-items-center">
-                <!-- <q-icon
-                  class="q-mr-sm"
-                  name="edit"
-                  color="teal"
-                  style="font-size: 20px; cursor: pointer;"
-                  @click.stop="itinerary = cloneDeep(item)"
-                />-->
                 <q-icon
                   name="delete"
                   color="negative"

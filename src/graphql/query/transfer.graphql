@@ -1,0 +1,122 @@
+fragment bookingTransferFragment on BookingTransfer {
+  id
+  type
+  toHour
+  driver {
+    id
+    name
+  }
+  houses {
+    id
+    name
+  }
+  charge
+  sent
+  canceled
+  note
+  contact
+  persons
+  date
+  hour
+  flightData
+  destination {
+    id
+    name
+  }
+  price
+  fromHour
+}
+
+fragment bookingTransferListFragment on BookingTransfer {
+  type
+  contact
+  date
+  hour
+  flightData
+  bookingIn {
+    tour {
+      code
+      color
+    }
+  }
+  bookingOut {
+    tour {
+      code
+      color
+    }
+  }
+  houses {
+    id
+  }
+  sent
+  canceled
+  persons
+  destination {
+    name
+  }
+  price
+  driver {
+    name
+  }
+  tour {
+    color
+  }
+}
+
+query listBookingTransferQuery(
+  $needle: String
+  $from: String
+  $to: String
+  $notification: [String]
+  $notificationComplete: Boolean
+  $driver: Int
+  $type: String
+) {
+  listBookingTransfers(
+    needle: $needle
+    from: $from
+    to: $to
+    notification: $notification
+    notificationComplete: $notificationComplete
+    driver: $driver
+    type: $type
+  ) {
+    ...bookingTransferListFragment
+  }
+}
+
+query bookingTransferIncompleteQuery {
+  incompleteBookingTransfers {
+    ...bookingTransferListFragment
+  }
+}
+
+query perBookingTransfersQuery($bookings: [Int]) {
+  per_bookingBookingTransfers(bookings: $bookings) {
+    ...bookingTransferFragment
+  }
+}
+
+mutation createBookingTransferMutation($input: createBookingTransferInput!) {
+  createBookingTransfer(input: $input) {
+    bookingTransfer {
+      ...bookingTransferFragment
+    }
+  }
+}
+
+mutation updateBookingTransferMutation($input: updateBookingTransferInput!) {
+  updateBookingTransfer(input: $input) {
+    bookingTransfer {
+      ...bookingTransferFragment
+    }
+  }
+}
+
+mutation deleteBookingTransferMutation($input: deleteBookingTransferInput!) {
+  deleteBookingTransfer(input: $input) {
+    bookingTransfer {
+      id
+    }
+  }
+}

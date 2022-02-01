@@ -52,20 +52,9 @@ function list() {
   return { pagination, loading, search, getNotifications };
 }
 
-export function useNotifications(service = 'htc') {
-  const {
-    load: getNotifications,
-    loading,
-    onError,
-    onResult,
-  } = useLazyQuery(
-    getNotificationsQuery,
-    () => {
-      return { services_code: service };
-    },
-    {
-      fetchPolicy: 'network-only',
-    }
+export function useNotifications() {
+  const { load, loading, onError, onResult } = useLazyQuery(
+    getNotificationsQuery
   );
 
   onResult((result: { data: { notifications: Partial<Notification>[] } }) => {
@@ -76,7 +65,12 @@ export function useNotifications(service = 'htc') {
     error(e);
   });
 
-  return { notifications, loading, getNotifications };
+  return {
+    notifications,
+    loading,
+    getNotifications: (serviceCode: string) =>
+      load(getNotificationsQuery, { services_code: serviceCode }),
+  };
 }
 
 function getItem(id: string) {
@@ -93,5 +87,14 @@ function getItem(id: string) {
 }
 
 export default function useNotification() {
-  return { item, items, sortBy, descending, list, getItem, variablesListQuery };
+  return {
+    item,
+    items,
+    sortBy,
+    descending,
+    list,
+    getItem,
+    variablesListQuery,
+    notifications,
+  };
 }

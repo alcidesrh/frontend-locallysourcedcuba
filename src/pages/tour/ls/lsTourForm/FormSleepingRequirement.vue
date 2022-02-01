@@ -1,38 +1,39 @@
 <script lang="ts">
-import { defineComponent, inject, ref, watch } from 'vue';
-import { Ref } from '@vue/reactivity/dist/reactivity';
+import { defineComponent, ref, watch } from 'vue';
 import {
   Booking,
   HouseRoomType,
   SleepingRequirement,
   SrRoomType,
-  Tour,
 } from 'src/graphql/@types/types';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useApolloClient } from '@vue/apollo-composable';
 import {
   createSleepingRequirementMutation,
   updateSleepingRequirementMutation,
   deleteSleepingRequirementRoomTypeMutation,
   createSleepingRequirementRoomTypeMutation,
 } from 'src/graphql/query/sleepingRequirement.graphql';
-import { updateBookingMutation } from 'src/graphql/query/booking.graphql';
+import {
+  updateBookingMutation,
+  bookingQuery,
+} from 'src/graphql/query/booking.graphql';
 import { error } from 'src/helpers/notification';
 import useHouseRoomType from 'src/pages/house/houseRoomTypeService';
 import useHouseType from 'src/pages/house/houseTypeService';
 import { apolloClient } from 'src/boot/apollo';
-import { omit } from 'lodash-es';
+import { omit, cloneDeep } from 'lodash-es';
+import useLsTour from 'src/pages/tour/ls/lsTourService';
 
 export default defineComponent({
   props: {
     booking: Object,
   },
   setup(props: Record<string, Partial<Booking>>) {
-    const tour = inject('item') as Ref<Tour>;
-    const booking = tour.value.bookings?.find((e) => e?.id == props.booking.id);
-    if (!booking) return;
+    const { item: tour } = useLsTour();
+
+    const booking = cloneDeep(props.booking);
 
     const sleepingDialog = ref(true);
-    const name = booking.name as string;
 
     const { list: houseRoomTypesList, items: houseRoomTypes } =
       useHouseRoomType();
@@ -52,10 +53,38 @@ export default defineComponent({
     const roomCant = ref<number | null>(null);
     const rooms = ref<Partial<SrRoomType>[]>([]);
     const loading = ref(false);
+    const { client } = useApolloClient();
 
     if (booking.sleepingRequirement?.sRRoomTypes) {
-      rooms.value = booking.sleepingRequirement
-        ?.sRRoomTypes as Partial<SrRoomType>[];
+      rooms.value = booking.sleepingRequirement?.sRRoomTypes
+        ? cloneDeep(
+            booking.sleepingRequirement?.sRRoomTypes as Partial<SrRoomType>[]
+          )
+        : [];
+    }
+
+    function updateCache() {
+      const result = cloneDeep(
+        client.cache.readQuery({
+          query: bookingQuery,
+          variables: {
+            tourID: tour.value.id,
+          },
+        }) as Record<string, Booking[]>
+      );
+
+      const index = result.bookings.indexOf(
+        result.bookings.find((e) => e.id == booking.id) as Booking
+      );
+      result.bookings[index] = booking as Booking;
+
+      client.cache.writeQuery({
+        query: bookingQuery,
+        data: {
+          bookings: result.bookings,
+        },
+        variables: { tourID: tour.value.id },
+      });
     }
 
     const {
@@ -72,20 +101,19 @@ export default defineComponent({
         }
       ) => {
         loading.value = true;
-
-        const bookingIndex = tour.value.bookings?.indexOf(booking) as number;
         sr.value = {
           booking: sr.value.booking,
           ...(sleepingRequirement as SleepingRequirement),
         };
-        if (tour.value.bookings)
-          (tour.value.bookings[bookingIndex] as Booking).sleepingRequirement =
-            sr.value as SleepingRequirement;
+
+        booking.sleepingRequirement = cloneDeep(
+          sr.value
+        ) as SleepingRequirement;
 
         for (let index = 0, data = {}; index < rooms.value.length; index++) {
           data = {
             sleepingRequirement: sr.value.id,
-            rooms: rooms.value[index].rooms,
+            cant: rooms.value[index].cant,
             roomType: rooms.value[index].roomType?.id,
           };
           await apolloClient
@@ -101,13 +129,11 @@ export default defineComponent({
                   createSRRoomType: { sRRoomType },
                 },
               }) => {
-                if (tour.value.bookings) {
-                  (
-                    tour.value.bookings[bookingIndex] as Booking
-                  ).sleepingRequirement?.sRRoomTypes?.push(
-                    sRRoomType as SrRoomType
-                  );
-                }
+                booking.sleepingRequirement?.sRRoomTypes?.push(
+                  sRRoomType as SrRoomType
+                );
+                sr.value = booking.sleepingRequirement as SleepingRequirement;
+                rooms.value = sr.value.sRRoomTypes as SrRoomType[];
               }
             );
         }
@@ -120,6 +146,7 @@ export default defineComponent({
             },
           },
         });
+        updateCache();
         loading.value = false;
       },
     }));
@@ -141,19 +168,53 @@ export default defineComponent({
         }
       ) => {
         sr.value = {
-          booking: sr.value.booking,
-          ...(sleepingRequirement as SleepingRequirement),
+          ...sr.value,
+          accommodationType: (sleepingRequirement as SleepingRequirement)
+            .accommodationType,
         };
+        booking.sleepingRequirement = cloneDeep(
+          sr.value
+        ) as SleepingRequirement;
+
+        updateCache();
       },
     }));
     onErrorUpdate((e: Error) => {
       error(e);
+      console.log(e);
     });
 
     watch(
       [loadingCreate, loadingUpdate],
       ([v, v2]) => (loading.value = v || v2)
     );
+
+    async function createRoom(room: Partial<SrRoomType>) {
+      await apolloClient
+        .mutate({
+          mutation: createSleepingRequirementRoomTypeMutation,
+          variables: {
+            input: {
+              sleepingRequirement: sr.value.id,
+              cant: room.cant,
+              roomType: room.roomType?.id,
+            },
+          },
+        })
+        .then(
+          ({
+            data: {
+              createSRRoomType: { sRRoomType },
+            },
+          }) => {
+            booking.sleepingRequirement?.sRRoomTypes?.push(
+              sRRoomType as SrRoomType
+            );
+            sr.value = booking.sleepingRequirement as SleepingRequirement;
+            rooms.value = sr.value.sRRoomTypes as SrRoomType[];
+          }
+        );
+    }
 
     return {
       loading,
@@ -163,18 +224,17 @@ export default defineComponent({
       houseRoomTypes,
       room,
       roomCant,
-      name,
       rooms,
       addRoom() {
         if (room.value)
           rooms.value.push({
             roomType: room.value as unknown as HouseRoomType,
-            rooms: roomCant.value,
+            cant: roomCant.value,
           });
         room.value = roomCant.value = null;
       },
       removeRoom(index: number) {
-        if (rooms.value[index].id)
+        if (rooms.value[index].id) {
           void apolloClient.mutate({
             mutation: deleteSleepingRequirementRoomTypeMutation,
             variables: {
@@ -183,10 +243,14 @@ export default defineComponent({
               },
             },
           });
+          booking.sleepingRequirement?.sRRoomTypes?.splice(index, 1);
+          updateCache();
+        }
 
         rooms.value.splice(index, 1);
       },
-      async save() {
+      save() {
+        if (loadingCreate.value || loadingUpdate.value) return;
         const data = omit(
           {
             ...sr.value,
@@ -194,22 +258,13 @@ export default defineComponent({
           },
           ['booking', 'sRRoomTypes']
         );
+
         if (!sr.value.id) {
           void createSleepingRequirement({ input: data });
         } else {
           loading.value = true;
           for (let index = 0; index < rooms.value.length; index++) {
-            if (!rooms.value[index].id)
-              await apolloClient.mutate({
-                mutation: createSleepingRequirementRoomTypeMutation,
-                variables: {
-                  input: {
-                    sleepingRequirement: sr.value.id,
-                    rooms: rooms.value[index].rooms,
-                    roomType: rooms.value[index].roomType?.id,
-                  },
-                },
-              });
+            if (!rooms.value[index].id) void createRoom(rooms.value[index]);
           }
           loading.value = false;
           void updateSleepingRequirement({ input: data });
@@ -223,10 +278,22 @@ export default defineComponent({
 <template >
   <q-dialog v-model="sleepingDialog">
     <q-card>
-      <q-card-section class="row items-center q-pb-none">
-        <div class="text-h6">Sleeping Requirement for {{name}}</div>
-        <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+      <q-card-section class="row items-center tw-py-3 bg-primary tw-mb-7">
+        <div class="tw-relative tw-w-full">
+          <div
+            class="text-h6 tw-text-white tw-pr-5"
+          >Booking: {{booking.name}}. Pax number: {{booking.pax}}</div>
+          <q-space />
+          <q-btn
+            class="tw-absolute tw-top-0 tw-right-0 tw--mr-3 tw--mt-2"
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+            color="white"
+          />
+        </div>
       </q-card-section>
 
       <q-card-section class="q-pt-none">
@@ -267,7 +334,7 @@ export default defineComponent({
                       <q-item-section>
                         <div class="tw-flex tw-justify-between">
                           <div style="min-width: 60px;">{{room.roomType?.name}}</div>
-                          <span style="min-width: 20px;" class="tw-mx-5">{{room.rooms}}</span>
+                          <span style="min-width: 20px;" class="tw-mx-5">{{room.cant}}</span>
                           <div>
                             <q-icon
                               @click="removeRoom(index)"

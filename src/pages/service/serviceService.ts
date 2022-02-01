@@ -2,9 +2,10 @@ import { Service } from 'src/graphql/@types/types.d';
 import {
   listServiceQuery,
   getServiceQuery,
+  getServiceInUseQuery,
 } from 'src/graphql/query/service.graphql';
 import { error } from 'src/helpers/notification';
-import { useQuery } from '@vue/apollo-composable';
+import { useQuery, useLazyQuery } from '@vue/apollo-composable';
 import useEntityFactory from 'src/composables/useEntityFactory';
 import { ref } from 'vue';
 import gql from 'graphql-tag';
@@ -40,24 +41,9 @@ function getItem(id: string) {
   });
 }
 
-function getServiceInUse(code: string) {
-  const { onError, onResult } = useQuery(
-    gql`
-      query getServices($code: String) {
-        services(code: $code) {
-          id
-          code
-          daysToShow
-        }
-      }
-    `,
-    () => ({
-      code: code,
-    }),
-    {
-      fetchPolicy: 'network-only',
-    }
-  );
+function setServiceInUse() {
+  const { onError, onResult, load, loading } =
+    useLazyQuery(getServiceInUseQuery);
   onError((e: Error) => {
     error(e);
   });
@@ -65,8 +51,13 @@ function getServiceInUse(code: string) {
   onResult((result: { data: { services: Partial<Service>[] } }) => {
     service.value = Object.assign({}, result.data.services[0]);
   });
+
+  return {
+    loading,
+    getService: (code: string) => load(getServiceInUseQuery, { code: code }),
+  };
 }
 
 export default function useService() {
-  return { item, items, list, getItem, getServiceInUse, service };
+  return { item, items, list, getItem, setServiceInUse, service };
 }

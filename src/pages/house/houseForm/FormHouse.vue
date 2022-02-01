@@ -6,7 +6,6 @@ import useHouseType from '../houseTypeService';
 import houseFeatureService from '../houseFeatureService';
 import useDestination from 'src/pages/destination/destinationService';
 import useHouseRoomType from '../houseRoomTypeService';
-import { HouseRoom } from 'src/graphql/@types/types.d';
 import FormHouseRoom from './FormHouseRoom.vue';
 import FormHouseSeason from './FormHouseSeason.vue';
 

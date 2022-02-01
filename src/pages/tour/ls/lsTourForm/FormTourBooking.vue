@@ -2,8 +2,9 @@
 import { defineComponent, inject, ref, watch } from 'vue';
 import { Ref } from '@vue/reactivity/dist/reactivity';
 import { Booking, Tour } from 'src/graphql/@types/types';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, useQuery, useApolloClient } from '@vue/apollo-composable';
 import {
+  bookingQuery,
   createBookingMutation,
   updateBookingMutation,
   deleteBookingMutation,
@@ -12,21 +13,59 @@ import { error } from 'src/helpers/notification';
 import globalLoading from 'src/store/loading';
 import SleepingRequirementForm from './FormSleepingRequirement.vue';
 import HouseForm from './FormHouse.vue';
+import FormTransfer from './FormTransfer.vue';
 import dayjs from 'dayjs';
 import itinerariesDays from 'src/store/generic';
+import { cloneDeep, omit } from 'lodash-es';
 
 export default defineComponent({
   setup() {
     const item = inject('item') as Ref<Tour>;
     const newBooking = ref<Partial<Booking>>({});
-    const bookings = ref<Partial<Booking>[]>(
-      (item.value.bookings as Partial<Booking>[]) || []
-    );
+    const bookings = ref<Partial<Booking>[]>([]);
     const index = ref(-1);
     const formRef = ref<Record<string, () => void>>({});
 
     itinerariesDays.value = null;
 
+    const { client } = useApolloClient();
+    const result = client.cache.readQuery({
+      query: bookingQuery,
+      variables: {
+        tourID: item.value.id,
+      },
+    });
+
+    if (result) {
+      bookings.value = cloneDeep(
+        (result as Record<'bookings', Booking[]>).bookings
+      );
+    } else {
+      globalLoading.value = true;
+      const { onError, onResult } = useQuery(bookingQuery, () => ({
+        tourID: item.value.id,
+      }));
+      onError((e: Error) => {
+        error(e);
+      });
+
+      onResult((result: { data: { bookings: Booking[] } }) => {
+        bookings.value = cloneDeep(result.data.bookings);
+        globalLoading.value = false;
+      });
+    }
+
+    function writeCache() {
+      client.cache.writeQuery({
+        query: bookingQuery,
+        data: {
+          bookings: bookings.value,
+        },
+        variables: {
+          tourID: item.value.id,
+        },
+      });
+    }
     const {
       mutate: createBooking,
       loading: loadingCreate,
@@ -44,6 +83,7 @@ export default defineComponent({
         bookings.value.push(booking);
         newBooking.value = {};
         formRef.value.resetValidation();
+        writeCache();
       },
     }));
     onErrorCreate((e: Error) => {
@@ -66,6 +106,7 @@ export default defineComponent({
         if (bookings.value) bookings.value[index.value] = booking as Booking;
         newBooking.value = {};
         formRef.value.resetValidation();
+        writeCache();
       },
     }));
     onErrorUpdate((e: Error) => {
@@ -88,9 +129,10 @@ export default defineComponent({
         }
       ) => {
         if (bookings.value) {
-          item.value.bookings = bookings.value = (
-            bookings.value as Booking[]
-          ).filter((r: Booking) => r.id != id);
+          bookings.value = (bookings.value as Booking[]).filter(
+            (r: Booking) => r.id != id
+          );
+          writeCache();
         }
       },
     }));
@@ -114,20 +156,32 @@ export default defineComponent({
       itineraries: [] as Array<Record<string, unknown>>,
     });
 
+    const transferEdit = ref({
+      booking: {},
+      refresh: false,
+    });
+
     return {
       newBooking,
       bookings,
       sleepingRequirementEdit,
       housesEdit,
+      transferEdit,
       itinerariesDays,
       formRef,
       onSubmit() {
+        const data = omit(newBooking.value, [
+          'sleepingRequirement',
+          'bookingAccommodations',
+        ]);
         if (!newBooking.value?.id) {
           void createBooking({
-            input: { ...newBooking.value, tours: [item.value.id] },
+            input: { ...data, tour: item.value.id },
           });
         } else {
-          void updateBooking({ input: newBooking.value });
+          void updateBooking({
+            input: data,
+          });
         }
       },
       edit(value: Booking) {
@@ -169,7 +223,7 @@ export default defineComponent({
       },
     };
   },
-  components: { SleepingRequirementForm, HouseForm },
+  components: { SleepingRequirementForm, HouseForm, FormTransfer },
 });
 </script>
 
@@ -233,7 +287,14 @@ export default defineComponent({
               outline
               @click="showHouses(props.row)"
             />
-            <BaseButton label="Transfers" type="submit" color="primary" class="q-ml-sm" outline />
+            <BaseButton
+              label="Transfers"
+              type="submit"
+              color="primary"
+              class="q-ml-sm"
+              outline
+              @click="transferEdit.booking = props.row; transferEdit.refresh = !transferEdit.refresh"
+            />
           </q-td>
         </template>
         <template v-slot:body-cell-icon="props">
@@ -268,5 +329,11 @@ export default defineComponent({
     :key="housesEdit.refresh"
     :booking="housesEdit.booking"
     :itineraries-days-prop="itinerariesDays"
+  />
+
+  <FormTransfer
+    v-if="transferEdit.booking.id"
+    :key="transferEdit.refresh"
+    :booking="transferEdit.booking"
   />
 </template>

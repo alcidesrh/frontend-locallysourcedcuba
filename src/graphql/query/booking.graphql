@@ -1,16 +1,67 @@
-fragment bookingFragment on Booking {
+fragment bookingBasicFragment on Booking {
   id
   name
   pax
   lp
+}
+
+fragment bookingFragment on Booking {
+  ...bookingBasicFragment
   sleepingRequirement {
     id
     description
     accommodationType {
       id
+      name
     }
     sRRoomTypes {
       id
+      cant
+      roomType {
+        id
+        name
+      }
+    }
+  }
+  bookingAccommodations {
+    id
+    houses {
+      id
+      house {
+        id
+        name
+      }
+      bookingHouseRooms {
+        id
+        price
+        cant
+        houseRoom {
+          roomType {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}
+
+query bookingHtcQuery($tourID: String) {
+  bookings(tour: $tourID) {
+    ...bookingBasicFragment
+  }
+}
+query bookingQuery($tourID: String) {
+  bookings(tour: $tourID) {
+    ...bookingFragment
+    _id
+  }
+}
+
+mutation createBookingHtcMutation($input: createBookingInput!) {
+  createBooking(input: $input) {
+    booking {
+      ...bookingBasicFragment
     }
   }
 }
@@ -19,6 +70,14 @@ mutation createBookingMutation($input: createBookingInput!) {
   createBooking(input: $input) {
     booking {
       ...bookingFragment
+    }
+  }
+}
+
+mutation updateBookingHtcMutation($input: updateBookingInput!) {
+  updateBooking(input: $input) {
+    booking {
+      ...bookingBasicFragment
     }
   }
 }
@@ -34,6 +93,83 @@ mutation updateBookingMutation($input: updateBookingInput!) {
 mutation deleteBookingMutation($input: deleteBookingInput!) {
   deleteBooking(input: $input) {
     booking {
+      id
+    }
+  }
+}
+
+mutation createBookingHouseMutation($input: createBookingHouseInput!) {
+  createBookingHouse(input: $input) {
+    bookingHouse {
+      id
+      house {
+        id
+        name
+        rooms {
+          roomType {
+            id
+            name
+          }
+        }
+      }
+      bookingHouseRooms {
+        id
+        price
+        cant
+        houseRoom {
+          roomType {
+            id
+          }
+        }
+      }
+    }
+  }
+}
+
+mutation deleteBookingHouseMutation($input: deleteBookingHouseInput!) {
+  deleteBookingHouse(input: $input) {
+    bookingHouse {
+      id
+    }
+  }
+}
+
+mutation createBookingHouseRoomMutation($input: createBookingHouseRoomInput!) {
+  createBookingHouseRoom(input: $input) {
+    bookingHouseRoom {
+      id
+      price
+      cant
+      houseRoom {
+        id
+        roomType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+mutation updateBookingHouseRoomMutation($input: updateBookingHouseRoomInput!) {
+  updateBookingHouseRoom(input: $input) {
+    bookingHouseRoom {
+      id
+      price
+      cant
+      houseRoom {
+        id
+        roomType {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+mutation deleteBookingHouseRoomMutation($input: deleteBookingHouseRoomInput!) {
+  deleteBookingHouseRoom(input: $input) {
+    bookingHouseRoom {
       id
     }
   }

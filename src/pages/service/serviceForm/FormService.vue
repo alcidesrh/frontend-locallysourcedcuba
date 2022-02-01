@@ -34,7 +34,7 @@ export default defineComponent({
         <BaseInput v-model="item.name" label="Name*" validate="text"></BaseInput>
       </div>
       <div class="col-12 col-sm-6 col-md-4">
-        <BaseInput v-model="item.code" label="Code"></BaseInput>
+        <BaseInput v-model="item.code" label="Code" readonly></BaseInput>
       </div>
       <div class="col-12 col-sm-6 col-md-4">
         <BaseInput v-model="item.daysToShow" label="Days to Show" type="number"></BaseInput>

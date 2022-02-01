@@ -11,7 +11,7 @@ mutation createSleepingRequirementMutation(
       }
       sRRoomTypes {
         id
-        rooms
+        cant
         roomType {
           id
           name
@@ -59,7 +59,7 @@ mutation createSleepingRequirementRoomTypeMutation(
         id
         name
       }
-      rooms
+      cant
     }
   }
 }
@@ -74,7 +74,7 @@ mutation updateSleepingRequirementRoomTypeMutation(
         id
         name
       }
-      rooms
+      cant
     }
   }
 }

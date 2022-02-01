@@ -1,37 +1,29 @@
-import { TourTemplate } from './../../graphql/@types/types.d';
-// import { error } from 'src/helpers/notification';
-// import { useQuery } from '@vue/apollo-composable';
+import { NotificationTour } from './../../graphql/@types/types.d';
+import { useLazyQuery } from '@vue/apollo-composable';
 import { ref } from 'vue';
-// import gql from 'graphql-tag';
+import { NotificationTourIncompleteQuery } from 'src/graphql/query/notification.graphql';
+import useService from 'src/pages/service/serviceService';
 
-const templates = ref<Partial<TourTemplate>[]>([]);
+const { service } = useService();
 
-// function getTemplates() {
-//   const {
-//     loading,
-//     onError: templatesOnError,
-//     onResult: teampltesOnResult,
-//   } = useQuery(gql`
-//     query getTemplates {
-//       tourTemplates(tourType: "htc") {
-//         id
-//         color
-//         name
-//       }
-//     }
-//   `);
+const pendingNotifications = ref<Partial<NotificationTour>[]>([]);
 
-//   teampltesOnResult((result: { data: { tours: Partial<TourTemplate>[] } }) => {
-//     templates.value = result.data.tours;
-//   });
+function getNotificationsTour() {
+  const { loading, onResult, load } = useLazyQuery(
+    NotificationTourIncompleteQuery
+  );
 
-//   templatesOnError((e) => {
-//     error(e);
-//   });
+  return {
+    loading,
+    onResult,
+    getPendingNotifications: () => {
+      load(NotificationTourIncompleteQuery, {
+        service: service.value.code,
+      });
+    },
+  };
+}
 
-//   return { loading };
-// }
-
-export default function service() {
-  return { templates };
+export default function tourService() {
+  return { getNotificationsTour, pendingNotifications };
 }

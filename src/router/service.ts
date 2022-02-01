@@ -4,26 +4,26 @@ import loadView from '../helpers/importComponents';
 
 const routes: RouteRecordRaw[] = [
   {
-    path: '/provinces',
+    path: '/services',
     component: {
-      render: () => h(resolveComponent('router-view'))
+      render: () => h(resolveComponent('router-view')),
     },
-    meta: { active: 'province' },
+    meta: { active: 'service' },
     children: [
       {
         path: '',
-        name: 'ListProvince',
-        component: () => loadView('province/ListProvince')
+        name: 'ListService',
+        component: () => loadView('service/ListService'),
       },
       {
         path: 'create',
-        name: 'CreateProvince',
-        component: () => loadView('province/CreateProvince'),
+        name: 'CreateService',
+        component: () => loadView('service/CreateService'),
       },
       {
         path: 'edit/:id',
-        name: 'EditProvince',
-        component: () => loadView('province/EditProvince'),
+        name: 'EditService',
+        component: () => loadView('service/EditService'),
       },
     ],
   },

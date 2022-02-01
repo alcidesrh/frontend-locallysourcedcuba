@@ -11,6 +11,7 @@ query getDriverQuery($id: ID!) {
 query getDriversQuery($order: [DriverFilter_order]) {
   drivers(order: $order) {
     id
+    _id
     name
   }
 }

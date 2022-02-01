@@ -27,37 +27,38 @@ export default defineComponent({
 
     let { loading: loadinglist } = list();
 
-    const { mutate: deleteHouseFeature, onError, onDone } = useMutation(
-      deleteHouseFeatureMutation,
-      () => ({
-        update: (
-          cache,
-          {
-            data: {
-              deleteHouseFeature: {
-                houseFeature: { id },
-              },
+    const {
+      mutate: deleteHouseFeature,
+      onError,
+      onDone,
+    } = useMutation(deleteHouseFeatureMutation, () => ({
+      update: (
+        cache,
+        {
+          data: {
+            deleteHouseFeature: {
+              houseFeature: { id },
             },
-          }
-        ) => {
-          let data: Record<string, []> | null = cache.readQuery({
-            query: listHouseFeatureQuery,
-          });
-          if (data) {
-            items.value = data.houseFeatures.filter(
-              (i: { id: string }) => i.id != id
-            );
+          },
+        }
+      ) => {
+        let data: Record<string, []> | null = cache.readQuery({
+          query: listHouseFeatureQuery,
+        });
+        if (data) {
+          items.value = data.houseFeatures.filter(
+            (i: { id: string }) => i.id != id
+          );
 
-            cache.writeQuery({
-              query: listHouseFeatureQuery,
-              data: {
-                houseFeatures: items.value,
-              },
-            });
-          }
-        },
-      })
-    );
+          cache.writeQuery({
+            query: listHouseFeatureQuery,
+            data: {
+              houseFeatures: items.value,
+            },
+          });
+        }
+      },
+    }));
 
     onError((e: Error) => {
       error(e);
@@ -135,7 +136,6 @@ export default defineComponent({
       items,
       item,
       columns,
-      deleteHouseFeature,
       loading: computed(
         () => loadinglist.value || loadingCreate.value || loadingUpdate
       ),

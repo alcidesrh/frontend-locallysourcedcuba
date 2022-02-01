@@ -2,17 +2,22 @@
 import { defineComponent, inject, watch, ref } from 'vue';
 import dayjs from 'dayjs';
 import { useNotifications } from 'src/pages/notification/notificationService';
+import useDriver from 'src/pages/driver/driverService';
 import notificationType from 'src/pages/tour/components/notificationTypeService';
 import { Service } from 'src/graphql/@types/types';
 import { Ref } from '@vue/reactivity/dist/reactivity';
+import useTransfer from './transferService';
 
 export default defineComponent({
   setup() {
-    const getTours = inject('getTours') as () => void;
-    const search = inject('search') as Ref<Record<string, unknown>>;
-    const templates = inject('templates') as Ref<
-      Array<Record<string, unknown>>
-    >;
+    const { list, search } = useTransfer();
+
+    const { lazyList, drivers } = useDriver();
+    if (!drivers.value.length) {
+      const { getDrivers } = lazyList();
+      getDrivers();
+    }
+    const { getTransfer, loading } = list();
 
     const filter = ref(
       !!Object.entries(search.value).filter(
@@ -23,15 +28,11 @@ export default defineComponent({
 
     const fromDatePopup = ref(false);
     const fromDate = ref(
-      search.value.from
-        ? dayjs(search.value.from as string).format('DD/MM/YYYY')
-        : null
+      search.value.from ? dayjs(search.value.from).format('DD/MM/YYYY') : null
     );
     const toDatePopup = ref(false);
     const toDate = ref(
-      search.value.to
-        ? dayjs(search.value.to as string).format('DD/MM/YYYY')
-        : null
+      search.value.to ? dayjs(search.value.to).format('DD/MM/YYYY') : null
     );
 
     const service = inject('service') as Ref<Partial<Service>>;
@@ -47,12 +48,12 @@ export default defineComponent({
       () => search.value.needle,
       (val) => {
         if (!val) {
-          getTours();
+          getTransfer();
           return;
         }
         clearTimeout(timeout as number);
         timeout = setTimeout(() => {
-          getTours();
+          getTransfer();
         }, 1000);
       }
     );
@@ -61,31 +62,29 @@ export default defineComponent({
       [() => search.value.from, () => search.value.to],
       ([newFrom, newTo]) => {
         fromDatePopup.value = toDatePopup.value = false;
-        if (newFrom)
-          fromDate.value = dayjs(newFrom as string).format('DD/MM/YYYY');
-        if (newTo) toDate.value = dayjs(newTo as string).format('DD/MM/YYYY');
+        if (newFrom) fromDate.value = dayjs(newFrom).format('DD/MM/YYYY');
+        if (newTo) toDate.value = dayjs(newTo).format('DD/MM/YYYY');
       }
     );
 
     watch([fromDate, toDate], ([newFrom, newTo]) => {
       if (!newFrom) {
         search.value.from = search.value.to = toDate.value = '';
-        getTours();
+        getTransfer();
       }
       if (!newTo) search.value.to = '';
     });
 
     watch(
-      () => search.value.template,
+      () => search.value.driver,
       (val) => {
-        if (!val) {
-          getTours();
-          return;
-        }
+        if (!val) getTransfer();
       }
     );
 
     return {
+      loading,
+      drivers,
       search,
       filter,
       fromDatePopup,
@@ -93,24 +92,23 @@ export default defineComponent({
       toDatePopup,
       toDate,
       notifications,
-      templates,
       onSubmit: () => {
-        getTours();
+        getTransfer();
       },
       reset() {
         search.value = {
-          service: 'htc',
           needle: '',
           from: '',
           to: '',
           notification: [] as number[],
           notificationComplete: null,
-          template: null,
+          driver: null,
+          type: '',
         };
         fromDate.value = toDate.value = '';
-        getTours();
+        getTransfer();
       },
-      removeChip(id: number, index: number) {
+      removeChip(index: number) {
         (search.value.notification as []).splice(index, 1);
       },
     };
@@ -199,13 +197,13 @@ export default defineComponent({
       </div>
 
       <div class="row q-col-gutter-md tw-mt-3">
-        <div class="col-12 col-md-6 col-lg-4">
+        <div class="col-12 col-md-6 col-lg-5">
           <BaseSelect
             v-model="search.notification"
             :options="notifications"
             label="Notifications"
             option-label="name"
-            option-value="_id"
+            option-value="slug"
             emit-value
             map-options
             autocomplete
@@ -214,7 +212,7 @@ export default defineComponent({
             options-selected-class="text-deep-orange"
           >
             <template v-slot:selected-item="{opt, index}">
-              <q-chip class="tw-mr-2" removable @remove="removeChip(opt._id, index)">
+              <q-chip class="tw-mr-2" removable @remove="removeChip(index)">
                 <q-icon
                   v-if="opt.icon"
                   :name="opt.icon"
@@ -265,47 +263,43 @@ export default defineComponent({
       <div class="row q-col-gutter-md tw-mt-3">
         <div class="col-12 col-md-6 col-lg-4">
           <BaseSelect
-            v-model="search.template"
-            :options="templates"
-            label="Templates"
+            v-model="search.driver"
+            :options="drivers"
+            label="Drivers"
             option-label="name"
             option-value="_id"
             emit-value
             map-options
             autocomplete
             clearable
-          >
-            <template v-slot:selected-item="scope">
-              <div class="row tw-w-full">
-                <div
-                  class="col"
-                  :style="{maxWidth: '30px', height: '30px', backgroundColor: scope.opt.color}"
-                ></div>
+          ></BaseSelect>
+        </div>
+      </div>
 
-                <div class="col tw-flex tw-justify-between tw-items-center">
-                  <label class="tw-ml-3" v-html="scope.opt.name"></label>
-                  <label class="tw-text-sm tw-text-gray-400">{{ scope.opt.type }}</label>
-                </div>
-              </div>
-            </template>
-            <template v-slot:option="scope">
-              <q-item v-bind="scope.itemProps" class="tw-flex tw-items-center">
-                <q-section avatar>
-                  <div :style="{width: '30px', height: '30px', backgroundColor: scope.opt.color}"></div>
-                </q-section>
-                <q-item-section class="tw-ml-3">
-                  <q-item-label v-html="scope.opt.name" />
-                  <q-item-label caption>{{ scope.opt.type }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-          </BaseSelect>
+      <div class="row q-col-gutter-md tw-mt-3">
+        <div class="col-12 col-md-6 col-lg-4">
+          <BaseSelect
+            v-model="search.type"
+            :options="['In', 'Out']"
+            label="Type"
+            emit-value
+            map-options
+            autocomplete
+            clearable
+          ></BaseSelect>
         </div>
       </div>
 
       <div class="row q-col-gutter-md tw-mt-3">
         <div class="col-12 col-md-6 col-lg-4 tw-flex tw-justify-end">
-          <BaseButton v-if="filter" label="Search" type="submit" color="primary" class="q-ml-sm" />
+          <BaseButton
+            v-if="filter"
+            :loading="loading"
+            label="Search"
+            type="submit"
+            color="primary"
+            class="q-ml-sm"
+          />
         </div>
       </div>
     </div>

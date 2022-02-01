@@ -96,6 +96,13 @@ const leftMenu = [
     icon: 'format_list_bulleted',
     active: 'htc-tour',
     link: '/htc-tour'
+  },
+
+  {
+    text: 'Transfer',
+    icon: 'transfer_within_a_station',
+    active: 'transfers',
+    link: '/transfers'
   }
 ];
 export default defineComponent({
@@ -138,24 +145,29 @@ svg
 </style>
 <template>
   <q-layout view="hHh LpR fff" class="text-gray-500">
-    <q-header elevated class="bg-primary text-white" height-hint="98">
-      <q-toolbar>
+    <q-header elevated class="bg-primary text-white tw-h-20 tw-flex tw-align-bottom">
+      <q-toolbar class="tw-flex tw-align-bottom">
         <BaseButton dense flat round icon="menu" @click="leftDrawerOpen = !leftDrawerOpen" />
 
         <q-toolbar-title>
-          <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg" />
-          </q-avatar>Title
+          <img src="logo.png" alt="Locally Sourced Cuba" />
         </q-toolbar-title>
 
-        <BaseButton dense flat round icon="settings" @click="rightDrawerOpen = !rightDrawerOpen" />
+        <BaseButton
+          dense
+          flat
+          round
+          icon="settings"
+          color="teal"
+          @click="rightDrawerOpen = !rightDrawerOpen"
+        />
       </q-toolbar>
 
-      <q-tabs align="left">
+      <!-- <q-tabs align="left">
         <q-route-tab to="/" label="Page One" />
         <q-route-tab to="/" label="Page Two" />
         <q-route-tab to="/" label="Page Three" />
-      </q-tabs>
+      </q-tabs>-->
     </q-header>
 
     <q-drawer show-if-above v-model="leftDrawerOpen" side="left" bordered>
@@ -257,11 +269,9 @@ svg
       </q-list>
     </q-drawer>
     <q-page-container>
-      <div class="tw-relative" :class="{'tw-opacity-50': loading}">
-        <router-view />
-        <q-inner-loading :showing="loading" class="tw-absolute">
-          <q-spinner-gears size="50px" color="primary" />
-        </q-inner-loading>
+      <div class="tw-relative">
+        <router-view :class="{'tw-opacity-50': loading}" />
+        <BaseLoading :showing="loading" />
       </div>
     </q-page-container>
   </q-layout>

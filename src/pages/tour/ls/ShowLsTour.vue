@@ -165,7 +165,7 @@ export default defineComponent({
                     v-if="n"
                     style="border-radius: 50px;"
                     class="tw-mx-1 tw-p-1 tw-text-xl tw-cursor-pointer"
-                    :class="{'tw-text-gray-700': !n.complete, 'text-green': n.complete}"
+                    :class="{'tw-text-gray-700': !n.complete, 'text-teal': n.complete}"
                     :name="n.icon"
                   />
                 </span>
@@ -288,9 +288,7 @@ export default defineComponent({
             </div>
           </div>
         </div>
-        <q-inner-loading :showing="loading">
-          <q-spinner-gears size="50px" color="primary" />
-        </q-inner-loading>
+        <BaseLoading :showing="loading" />
       </q-card-section>
     </q-card>
   </q-dialog>

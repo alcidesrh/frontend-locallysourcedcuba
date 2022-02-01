@@ -15,10 +15,11 @@ export default defineComponent({
 
     provide('loadTours', loadTours);
 
-    const { getServiceInUse, service } = useService();
+    const { setServiceInUse, service } = useService();
 
     if (service.value.code != 'htc') {
-      getServiceInUse('htc');
+      const { getService } = setServiceInUse();
+      getService('htc');
     }
 
     provide('item', item);

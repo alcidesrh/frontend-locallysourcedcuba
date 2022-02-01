@@ -102,7 +102,6 @@ export default defineComponent({
       );
 
     const startDatePopup = ref(false);
-    const endDatePopup = ref(false);
 
     watch(
       () => item.value.startDate,
@@ -183,7 +182,6 @@ export default defineComponent({
       templates,
       guidesSelect,
       startDatePopup,
-      endDatePopup,
       startDate,
       endDate,
       transportations,

@@ -177,28 +177,6 @@ fragment lsTourFragment on Tour {
     id
     name
   }
-  bookings {
-    id
-    name
-    pax
-    lp
-    sleepingRequirement {
-      id
-      description
-      accommodationType {
-        id
-        name
-      }
-      sRRoomTypes {
-        id
-        rooms
-        roomType {
-          id
-          name
-        }
-      }
-    }
-  }
   guide {
     id
     name

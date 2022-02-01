@@ -31,10 +31,10 @@ export default defineComponent({
       getNotifications,
       notifications,
       loading: loadingList,
-    } = useNotifications(item.value.tourType || undefined);
+    } = useNotifications();
     if (notificationType.value != item.value.tourType) {
       notificationType.value = item.value.tourType || null;
-      getNotifications();
+      getNotifications(item.value.tourType || '');
     }
 
     const itemNotifications: Partial<NotificationTourTemplate>[] = (cloneDeep(

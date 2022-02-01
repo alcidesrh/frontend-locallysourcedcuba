@@ -1,10 +1,7 @@
 <script lang="ts">
 import useTransportation from 'src/pages/transportation/transportationService';
-import useLocation from 'src/pages/location/locationService';
 import useDriver from 'src/pages/driver/driverService';
 import { defineComponent } from 'vue';
-import { useRouter } from 'vue-router';
-
 import FormTransportationPrice from './FormTransportationPrice.vue';
 import FormTransportationRoute from './FormTransportationRoute.vue';
 
@@ -12,14 +9,7 @@ export default defineComponent({
   setup() {
     const { item, transportationFormStep } = useTransportation();
 
-    transportationFormStep.value = 1
-
-    const { locations, lazyList } = useLocation();
-
-    if (!locations.value.length) {
-      const { getLocations } = lazyList();
-      getLocations();
-    }
+    transportationFormStep.value = 1;
 
     const { drivers, lazyList: driverLazyList } = useDriver();
 
@@ -28,16 +18,10 @@ export default defineComponent({
       getDrivers();
     }
 
-    const router = useRouter();
     return {
       item,
-      locations,
       drivers,
       transportationFormStep,
-      cancel() {
-        void router.push({ name: 'ListTransportation' });
-        item.value = {};
-      },
     };
   },
   components: { FormTransportationPrice, FormTransportationRoute },

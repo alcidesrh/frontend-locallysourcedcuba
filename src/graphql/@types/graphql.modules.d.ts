@@ -19,10 +19,20 @@ export const deleteActivityComboMutation: DocumentNode;
 declare module '*/booking.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
-  export const bookingFragment: DocumentNode;
+  export const bookingBasicFragment: DocumentNode;
+export const bookingFragment: DocumentNode;
+export const bookingHtcQuery: DocumentNode;
+export const bookingQuery: DocumentNode;
+export const createBookingHtcMutation: DocumentNode;
 export const createBookingMutation: DocumentNode;
+export const updateBookingHtcMutation: DocumentNode;
 export const updateBookingMutation: DocumentNode;
 export const deleteBookingMutation: DocumentNode;
+export const createBookingHouseMutation: DocumentNode;
+export const deleteBookingHouseMutation: DocumentNode;
+export const createBookingHouseRoomMutation: DocumentNode;
+export const updateBookingHouseRoomMutation: DocumentNode;
+export const deleteBookingHouseRoomMutation: DocumentNode;
 
   export default defaultDocument;
 }
@@ -150,6 +160,7 @@ declare module '*/notification.graphql' {
   export const getNotificationQuery: DocumentNode;
 export const getNotificationsQuery: DocumentNode;
 export const listNotificationQuery: DocumentNode;
+export const NotificationTourIncompleteQuery: DocumentNode;
 export const createNotificationMutation: DocumentNode;
 export const updateNotificationMutation: DocumentNode;
 export const priorityNotificationMutation: DocumentNode;
@@ -182,6 +193,7 @@ declare module '*/service.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const listServiceQuery: DocumentNode;
+export const getServiceInUseQuery: DocumentNode;
 export const getServiceQuery: DocumentNode;
 export const createServiceMutation: DocumentNode;
 export const updateServiceMutation: DocumentNode;
@@ -241,6 +253,21 @@ export const listLsTourTemplateQuery: DocumentNode;
 export const getLsTourTemplateQuery: DocumentNode;
 export const createLsTourTemplateMutation: DocumentNode;
 export const updateLsTourTemplateMutation: DocumentNode;
+
+  export default defaultDocument;
+}
+    
+
+declare module '*/transfer.graphql' {
+  import { DocumentNode } from 'graphql';
+  const defaultDocument: DocumentNode;
+  export const bookingTransferFragment: DocumentNode;
+export const listBookingTransferQuery: DocumentNode;
+export const bookingTransferIncompleteQuery: DocumentNode;
+export const perBookingTransfersQuery: DocumentNode;
+export const createBookingTransferMutation: DocumentNode;
+export const updateBookingTransferMutation: DocumentNode;
+export const deleteBookingTransferMutation: DocumentNode;
 
   export default defaultDocument;
 }

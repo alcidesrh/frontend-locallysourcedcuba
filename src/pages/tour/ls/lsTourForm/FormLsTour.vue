@@ -15,10 +15,11 @@ export default defineComponent({
   setup() {
     let { item, tourFormStep } = useLsTour();
 
-    const { getServiceInUse, service } = useService();
+    const { setServiceInUse, service } = useService();
 
     if (service.value.code != 'ls') {
-      getServiceInUse('ls');
+      const { getService } = setServiceInUse();
+      getService('ls');
     }
 
     provide('item', item);

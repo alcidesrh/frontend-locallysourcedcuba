@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import FormTourTemplate from './htcTourTemplateForm/FormHtcTourTemplate.vue';
 import useTourTemplate from './htcTourTemplateService';
 import { useRouter, useRoute } from 'vue-router';
+import globalLoading from 'src/store/loading';
 
 export default defineComponent({
   setup() {
@@ -10,7 +11,9 @@ export default defineComponent({
 
     const route = useRoute();
 
+    globalLoading.value = true;
     const { loading } = getItem(route.params.id as string);
+    watch([loading], ([v]) => (globalLoading.value = v));
 
     tourTemplateFormStep.value = 1;
 

@@ -86,6 +86,12 @@ const rightMenu = [
 
 const leftMenu = [
   {
+    text: 'Shedule Guide',
+    icon: 'edit_calendar',
+    active: 'shedule-guide',
+    link: '/shedule-guide'
+  },
+  {
     text: 'LS Tour',
     icon: 'format_list_bulleted',
     active: 'ls-tour',
@@ -97,7 +103,6 @@ const leftMenu = [
     active: 'htc-tour',
     link: '/htc-tour'
   },
-
   {
     text: 'Transfer',
     icon: 'transfer_within_a_station',

@@ -27,6 +27,12 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: 'shedule-guide',
+    name: 'SheduleGuide',
+    meta: { active: 'shedule-guide' },
+    component: () => loadView('guide/SheduleGuide'),
+  },
 ];
 
 export default routes;

@@ -28,6 +28,7 @@ fragment bookingTransferFragment on BookingTransfer {
 }
 
 fragment bookingTransferListFragment on BookingTransfer {
+  id
   type
   contact
   date

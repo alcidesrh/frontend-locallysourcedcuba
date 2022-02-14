@@ -8,6 +8,9 @@ fragment basicListTourFragment on Tour {
     id
     icon
     complete
+    tour {
+      id
+    }
   }
   name
   guide {

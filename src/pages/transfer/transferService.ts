@@ -4,9 +4,10 @@ import {
   bookingTransferIncompleteQuery,
 } from 'src/graphql/query/transfer.graphql';
 import { error } from 'src/helpers/notification';
-import { useLazyQuery, useQuery } from '@vue/apollo-composable';
+import { useLazyQuery } from '@vue/apollo-composable';
 import useEntityFactory from 'src/composables/useEntityFactory';
 import { ref } from 'vue';
+import { cloneDeep } from '@apollo/client/utilities';
 
 const { items, item } = useEntityFactory<Partial<BookingTransfer>>();
 
@@ -29,7 +30,7 @@ function list() {
     (result: {
       data: { listBookingTransfers: Partial<BookingTransfer>[] };
     }) => {
-      items.value = result.data.listBookingTransfers;
+      items.value = cloneDeep(result.data.listBookingTransfers);
     }
   );
 
@@ -44,17 +45,9 @@ function list() {
 }
 
 function getIncompleteTransfers() {
-  const { loading, onError, onResult } = useQuery(
+  const { loading, onError, onResult, load } = useLazyQuery(
     bookingTransferIncompleteQuery
   );
-
-  // onResult(
-  //   (result: {
-  //     data: { listBookingTransfers: Partial<BookingTransfer>[] };
-  //   }) => {
-  //     items.value = result.data.listBookingTransfers;
-  //   }
-  // );
 
   onError((e) => {
     error(e);
@@ -63,23 +56,11 @@ function getIncompleteTransfers() {
   return {
     loading,
     onResult,
+    getPendingTransfersNotifications: () => {
+      load(bookingTransferIncompleteQuery);
+    },
   };
 }
-
-// function getItem(id: string) {
-//   const { onError, onResult, loading } = useQuery(getTourQuery, () => ({
-//     id: `/api/tours/${id}`,
-//   }));
-//   onError((e: Error) => {
-//     error(e);
-//   });
-
-//   onResult((result: { data: { tour: BookingTransfer } }) => {
-//     item.value = cloneDeep(result.data.tour);
-//   });
-
-//   return { loading };
-// }
 
 export default function service() {
   return {

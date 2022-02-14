@@ -1,23 +1,29 @@
 <script lang="ts">
-import { defineComponent, toRefs, ref } from 'vue';
-import { NotificationTour, Notification } from 'src/graphql/@types/types';
+import { defineComponent, ref, computed } from 'vue';
+import tourService from 'src/pages/tour/tourService';
+import TourChip from 'src/pages/tour/components/TourChip.vue';
+import { useNotifications } from 'src/pages/notification/notificationService';
+
 export default defineComponent({
-  props: ['notifications', 'pendingNotifications', 'editRoute'],
-  setup(props) {
-    const { notifications } = toRefs(props as Record<string, Notification[]>);
+  components: {
+    TourChip,
+  },
+  props: ['editRoute'],
+  setup() {
+    const { notifications } = useNotifications();
 
-    const { pendingNotifications } = toRefs(
-      props as Record<string, NotificationTour[]>
+    const { pendingNotifications } = tourService();
+
+    const menu = computed(() =>
+      notifications.value.map((e) => {
+        return {
+          ...e,
+          notificationsPending: pendingNotifications.value.filter(
+            (n) => n.notification?.id == e.id
+          ),
+        };
+      })
     );
-
-    const menu = notifications.value.map((e) => {
-      return {
-        ...e,
-        notificationsPending: pendingNotifications.value.filter(
-          (n) => n.notification.id == e.id
-        ),
-      };
-    });
 
     const menuStates = ref(
       Array.from({ length: notifications.value.length }, () => false)
@@ -26,13 +32,13 @@ export default defineComponent({
     return {
       menu,
       menuStates,
-      setMenuState: (i: number) => {
-        menuStates.value = Array.from(
-          { length: notifications.value.length },
-          () => false
-        );
-        menuStates.value[i] = true;
-      },
+      // setMenuState: (i: number) => { ///Show Menu when over---------
+      //   menuStates.value = Array.from(
+      //     { length: notifications.value.length },
+      //     () => false
+      //   );
+      //   menuStates.value[i] = true;
+      // },
     };
   },
 });
@@ -43,22 +49,21 @@ export default defineComponent({
     size="md"
     dense
     flat
-    @mouseover="setMenuState(i)"
     v-for="n,i in menu"
     :key="n.id"
     :icon="n.icon"
-    :class="{'tw-text-red-500': n.notificationsPending.length, 'tw-text-green-500': !n.notificationsPending.length}"
+    :class="{'text-orange-8': n.notificationsPending.length, 'text-teal': !n.notificationsPending.length}"
     class="tw-text-2xl tw-cursor-pointer tw-mx-1"
   >
     <q-badge
-      color="orange"
+      color="indigo"
       floating
       v-if="n.notificationsPending.length"
     >{{n.notificationsPending.length}}</q-badge>
     <q-menu v-model="menuStates[i]" v-if="n.notificationsPending.length">
       <q-list style="min-width: 200px" class="tw-py-3">
         <q-item
-          :to="{ name: editRoute, params: { id: nt.tour._id } }"
+          :to="{ name: editRoute, params: { id: nt.tour?._id } }"
           class="tw-px-2"
           clickable
           v-close-popup
@@ -68,12 +73,8 @@ export default defineComponent({
         >
           <q-item-section
             class="tw-rounded-lg tw-flex tw-justify-center tw-content-center tw-items-center"
-            :style="{backgroundColor: nt.tour.color}"
           >
-            <div
-              class="tw-bg-gray-700 tw-text-white tw-rounded-lg tw-tracking-widest tw-cursor-pointer tw-absolute"
-              style="padding: 0px 10px;"
-            >{{nt.tour.code}}</div>
+            <TourChip :tour="nt.tour" />
           </q-item-section>
         </q-item>
       </q-list>

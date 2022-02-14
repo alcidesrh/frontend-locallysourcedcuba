@@ -75,7 +75,7 @@ export default defineComponent({
 
 <template>
   <q-dialog v-model="dialog">
-    <q-card>
+    <q-card style="min-width: 750px;">
       <q-card-section v-show="!loading" class="row items-center q-pb-none">
         <div class="text-h6 tw-mr-2">{{tour?.code}}</div>
         <q-icon
@@ -105,7 +105,7 @@ export default defineComponent({
 
       <q-card-section v-show="!loading" class="row items-center q-pb-none"></q-card-section>
 
-      <q-card-section style="min-width: 560px; min-height: 190px">
+      <q-card-section style="min-height: 190px" class="tw-px-10">
         <div v-show="!loading">
           <div class="row">
             <div class="col-12 tw-mb-2 tw-flex tw-justify-between tw-items-center">

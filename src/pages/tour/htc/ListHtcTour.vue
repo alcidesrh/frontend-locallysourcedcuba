@@ -17,9 +17,10 @@ import tourService from 'src/pages/tour/tourService';
 import ShowHtcTour from 'src/pages/tour/htc/ShowHtcTour.vue';
 import gql from 'graphql-tag';
 import globalLoading from 'src/store/loading';
-import { apolloClient } from 'src/boot/apollo';
-import { useNotifications } from 'src/pages/notification/notificationService';
+import { cache } from 'src/boot/apollo';
 import PendingNotificationTour from 'src/pages/tour/components/PendingNotificationTour.vue';
+import { cloneDeep } from 'lodash-es';
+import { useNotifications } from 'src/pages/notification/notificationService';
 
 export default defineComponent({
   components: {
@@ -31,32 +32,39 @@ export default defineComponent({
     const router = useRouter();
     const $q = useQuasar();
 
-    const { notifications } = useNotifications();
+    const { list, items, search, templates, getTemplates } = useTour();
 
-    const { getNotificationsTour, pendingNotifications } = tourService();
+    const { getTours, loading: loadingList } = list();
+
+    const { getNotificationsTour } = tourService();
 
     const {
-      getPendingNotifications,
-      onResult: onResultGetPendingNotificationTour,
+      refetch: refetchPendingNotifications,
+      load: loadPendingNotifications,
+      onResult: onResultPendingNotifications,
     } = getNotificationsTour();
 
-    onResultGetPendingNotificationTour(
-      (result: {
-        data: {
-          notifications_tour_incompleteNotificationTours: Partial<NotificationTour>[];
-        };
-      }) => {
-        pendingNotifications.value =
-          result.data.notifications_tour_incompleteNotificationTours;
-      }
-    );
+    onResultPendingNotifications(() => {
+      if (!items.value.length) getTours();
+    });
+
+    if (items.value.length) {
+      const data: Record<string, []> | null = cache.readQuery({
+        query: listTourQuery,
+        variables: search.value,
+      });
+      if (data) items.value = cloneDeep(data.listTours);
+    }
+
+    const { getNotifications } = useNotifications();
+    getNotifications('htc');
 
     const { setServiceInUse, service } = useService();
 
     watch(
       () => service.value.code,
       () => {
-        getPendingNotifications();
+        loadPendingNotifications();
       }
     );
 
@@ -65,15 +73,11 @@ export default defineComponent({
 
     provide('service', service);
 
-    const { list, items, search, templates, getTemplates } = useTour();
-
     provide('search', search);
 
     if (!templates.value.length) getTemplates();
 
     provide('templates', templates);
-
-    const { getTours, loading: loadingList } = list();
 
     const startDate = ref('');
     const {
@@ -117,21 +121,13 @@ export default defineComponent({
       ([val, val2]) => (globalLoading.value = val || val2)
     );
 
-    if (!items.value.length) getTours();
-    else {
-      const data: Record<string, []> | null = apolloClient.cache.readQuery({
-        query: listTourQuery,
-        variables: search.value,
-      });
-      if (data) items.value = data.listTours;
-    }
-
     provide('getTours', getTours);
     provide('loading', loadingList);
 
     const {
       mutate: updateNotificationTourMutation,
       onError: onErrorNotificationState,
+      onDone: onDoneUpdateNotificationTour,
     } = useMutation(
       gql`
         mutation updateNotificationTourMutation(
@@ -146,6 +142,10 @@ export default defineComponent({
         }
       `
     );
+
+    onDoneUpdateNotificationTour(() => {
+      void refetchPendingNotifications();
+    });
 
     onErrorNotificationState((e: Error) => {
       error(e);
@@ -186,8 +186,6 @@ export default defineComponent({
       id: ref<string | null>(null),
       refreshView: ref(false),
       service,
-      notifications,
-      pendingNotifications,
       tours,
       loadingList,
       edit(id: string) {
@@ -230,22 +228,30 @@ export default defineComponent({
         }
 
         return (
-          '<span class="tw-text-gray-500">Showing </span> ' +
+          '<span class="tw-text-gray-700">Showing </span> ' +
           `${
             dayjs(search.value.to || new Date()).diff(
               search.value.from || new Date(),
               'day'
             ) || (service.value.daysToShow as number)
           }` +
-          '<span class="tw-text-gray-500"> days. From</span> ' +
+          '<span class="tw-text-gray-700"> days. From</span> ' +
           from +
-          ' <span class="tw-text-gray-500">to</span> ' +
+          ' <span class="tw-text-gray-700">to</span> ' +
           to
         );
       }),
       updateNotification(n: NotificationTour) {
         void updateNotificationTourMutation({
           input: { id: n.id, complete: !n.complete },
+        });
+        n.complete = !n.complete;
+        cache.writeQuery({
+          query: listTourQuery,
+          variables: { ...search.value },
+          data: {
+            listTours: items.value,
+          },
         });
       },
       updateTour(t: Tour) {
@@ -260,36 +266,27 @@ export default defineComponent({
 
 <template>
   <q-page padding>
-    <q-card class="tw-mt-0 tw-flex tw-items-center tw-p-5">
-      <div class="row tw-w-full">
-        <div class="col-12 tw-flex tw-items-center tw-justify-between tw-mb-5 tw-md-0">
-          <BaseButton
-            round
-            icon="add"
-            type="button"
-            color="primary"
-            class="q-ml-sm"
-            @click="$router.push({name: 'CreateHtcTour'})"
-          />
-          <div>
-            <PendingNotificationTour
-              :key="notifications.length"
-              :notifications="notifications"
-              :pending-notifications="pendingNotifications"
-              edit-route="EditHtcTour"
-            />
-          </div>
-        </div>
-        <div class="col-12">
+    <q-card flat class="tw-mt-0 tw-flex tw-items-center tw-p-5">
+      <div class="tw-absolute tw-top-1 tw-right-1">
+        <PendingNotificationTour edit-route="EditHtcTour" />
+      </div>
+      <div class="row tw-w-full tw-mt-5">
+        <div class="col-12 tw-flex tw-items-center">
           <SearchTour v-if="service.code == 'htc'" />
         </div>
       </div>
     </q-card>
-    <div
-      class="tw-text-right tw-pt-5 tw-font-semibold tw-text-gray-700"
-      v-if="service.daysToShow"
-      v-html="showing"
-    ></div>
+    <div class="tw-flex tw-justify-end tw-items-center" v-if="service.daysToShow">
+      <div class="tw-font-semibold tw-text-gray-700" v-html="showing"></div>
+      <BaseButton
+        label="Create Tour"
+        icon="add"
+        type="button"
+        color="primary"
+        class="q-ml-sm tw-ml-5"
+        @click="$router.push({name: 'CreateHtcTour'})"
+      />
+    </div>
     <q-list class="tw-mt-5">
       <div v-for="(key, index) in Object.keys(tours)" :key="index">
         <q-item>

@@ -29,7 +29,7 @@ export default defineComponent({
 
 <template>
   <q-dialog v-model="dialog">
-    <q-card>
+    <q-card style="min-width: 750px;">
       <q-card-section class="row items-center q-pb-none">
         <div class="text-h6 tw-mr-2">Transfer {{transfer.type}}</div>
         <q-space />
@@ -38,7 +38,7 @@ export default defineComponent({
 
       <q-card-section class="row items-center q-pb-none"></q-card-section>
 
-      <q-card-section style="min-width: 560px; min-height: 190px">
+      <q-card-section style="min-height: 190px" class="tw-px-10">
         <div>
           <div class="row">
             <div class="col-12 tw-mb-2 tw-flex tw-justify-between tw-items-center">
@@ -63,6 +63,7 @@ export default defineComponent({
                     name="home"
                   />
                   <q-icon
+                    @click.stop="$emit('updateNotification', {transfer: transfer})"
                     name="email"
                     style="border-radius: 50px; font-size: 20px;"
                     class="tw-mx-1 tw-p-1 tw-cursor-pointer"

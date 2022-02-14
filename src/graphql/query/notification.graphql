@@ -62,7 +62,10 @@ query NotificationTourIncompleteQuery($service: String) {
       _id
       code
       color
-      startDate
+      notifications {
+        icon
+        complete
+      }
     }
     days
     notification {

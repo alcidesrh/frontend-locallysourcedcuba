@@ -2,8 +2,6 @@
 import { defineComponent, inject, watch, ref } from 'vue';
 import dayjs from 'dayjs';
 import { useNotifications } from 'src/pages/notification/notificationService';
-import notificationType from 'src/pages/tour/components/notificationTypeService';
-import { Service } from 'src/graphql/@types/types';
 import { Ref } from '@vue/reactivity/dist/reactivity';
 
 export default defineComponent({
@@ -34,13 +32,7 @@ export default defineComponent({
         : null
     );
 
-    const service = inject('service') as Ref<Partial<Service>>;
-
-    const { getNotifications, notifications } = useNotifications();
-    if (notificationType.value != service.value.code) {
-      notificationType.value = service.value.code as string;
-      getNotifications(service.value.code as string);
-    }
+    const { notifications } = useNotifications();
 
     let timeout: unknown;
     watch(
@@ -131,6 +123,7 @@ export default defineComponent({
       <div class="col tw-flex tw-items-center">
         <BaseButton
           :label="filter ? 'Hide filters' : 'Show filters'"
+          icon="filter_alt"
           type="button"
           color="primary"
           class="q-ml-sm"

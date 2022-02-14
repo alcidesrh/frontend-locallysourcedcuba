@@ -9,18 +9,33 @@ const { service } = useService();
 const pendingNotifications = ref<Partial<NotificationTour>[]>([]);
 
 function getNotificationsTour() {
-  const { loading, onResult, load } = useLazyQuery(
-    NotificationTourIncompleteQuery
+  const { loading, onResult, refetch, load } = useLazyQuery(
+    NotificationTourIncompleteQuery,
+    {
+      service: service.value.code,
+    }
+  );
+
+  onResult(
+    (result: {
+      data: {
+        notifications_tour_incompleteNotificationTours: Partial<NotificationTour>[];
+      };
+    }) => {
+      pendingNotifications.value =
+        result.data.notifications_tour_incompleteNotificationTours;
+    }
   );
 
   return {
     loading,
     onResult,
-    getPendingNotifications: () => {
+    load: () => {
       load(NotificationTourIncompleteQuery, {
         service: service.value.code,
       });
     },
+    refetch,
   };
 }
 

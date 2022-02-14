@@ -30,7 +30,7 @@ function list() {
   } = useLazyQuery(listTourQuery);
 
   onResult((result: { data: { listTours: Partial<Tour>[] } }) => {
-    items.value = result.data.listTours;
+    items.value = cloneDeep(result.data.listTours);
   });
 
   onError((e) => {

@@ -232,6 +232,8 @@ export const listLsTourQuery: DocumentNode;
 export const getLsTourQuery: DocumentNode;
 export const createLsTourMutation: DocumentNode;
 export const updateLsTourMutation: DocumentNode;
+export const listTourWithGuideSheduleQuery: DocumentNode;
+export const listTourWithoutGuideSheduleQuery: DocumentNode;
 
   export default defaultDocument;
 }
@@ -262,6 +264,7 @@ declare module '*/transfer.graphql' {
   import { DocumentNode } from 'graphql';
   const defaultDocument: DocumentNode;
   export const bookingTransferFragment: DocumentNode;
+export const bookingTransferListFragment: DocumentNode;
 export const listBookingTransferQuery: DocumentNode;
 export const bookingTransferIncompleteQuery: DocumentNode;
 export const perBookingTransfersQuery: DocumentNode;

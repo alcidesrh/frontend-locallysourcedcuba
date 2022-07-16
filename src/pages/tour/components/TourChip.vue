@@ -1,6 +1,5 @@
 <script lang="ts">
-import { Tour } from 'src/graphql/@types/types';
-import { defineComponent, toRefs } from 'vue';
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: ['tour'],

@@ -84,7 +84,7 @@ export default defineComponent({
       },
       remove() {
         dialog.value = false;
-        emit('remove', tour);
+        emit('remove', tour.value);
       },
       formatItinerary(i: ItineraryDay[]) {
         let output = '';
@@ -131,7 +131,7 @@ export default defineComponent({
           style="font-size: 20px; cursor: pointer"
         />
         <q-icon
-          @click="$emit('edit',{id: tour?._id})"
+          @click="$emit('edit', tour?._id)"
           class="q-mr-sm"
           name="edit"
           color="green"
@@ -153,6 +153,9 @@ export default defineComponent({
       <q-card-section style="min-height: 190px" class="tw-px-10">
         <div v-show="!loading">
           <div class="row">
+            <div class="col-12 tw-mb-2">
+              <slot name="remove-guide"></slot>
+            </div>
             <div class="col-12 tw-mb-2 tw-flex tw-justify-between tw-items-center">
               <div>
                 <span class="tw-font-semibold tw-text-gray-500">Name:</span>

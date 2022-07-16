@@ -13,6 +13,7 @@ import { Activity } from 'src/graphql/@types/types';
 import request from 'src/api/request';
 
 export default defineComponent({
+  components: { FormActivityCombo },
   setup() {
     const { item, activitiesSelectCombo } = useActivity();
 
@@ -93,7 +94,6 @@ export default defineComponent({
       onSubmit,
     };
   },
-  components: { FormActivityCombo },
 });
 </script>
 

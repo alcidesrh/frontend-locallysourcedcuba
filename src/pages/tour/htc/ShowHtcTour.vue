@@ -38,6 +38,9 @@ export default defineComponent({
               icon
               complete
             }
+            guide {
+              fullName
+            }
           }
         }
       `,
@@ -66,7 +69,7 @@ export default defineComponent({
       },
       remove() {
         dialog.value = false;
-        emit('remove', tour);
+        emit('remove', tour.value);
       },
     };
   },
@@ -108,6 +111,9 @@ export default defineComponent({
       <q-card-section style="min-height: 190px" class="tw-px-10">
         <div v-show="!loading">
           <div class="row">
+            <div class="col-12 tw-mb-2">
+              <slot name="remove-guide"></slot>
+            </div>
             <div class="col-12 tw-mb-2 tw-flex tw-justify-between tw-items-center">
               <div>
                 <span class="tw-font-semibold tw-text-gray-500">Name:</span>
@@ -139,6 +145,10 @@ export default defineComponent({
             <div class="col-12 tw-mb-2">
               <span class="tw-font-semibold tw-text-gray-500">End Place:</span>
               <span class="tw-ml-2 tw-text-gray-700 tw-font-semibold">{{tour?.finishPlace}}</span>
+            </div>
+            <div class="col-12 tw-mb-2">
+              <span class="tw-font-semibold tw-text-gray-500">Guide:</span>
+              <span class="tw-ml-2 tw-text-gray-700 tw-font-semibold">{{tour?.guide?.fullName}}</span>
             </div>
             <div class="col-12 tw-mb-2">
               <div class="row">

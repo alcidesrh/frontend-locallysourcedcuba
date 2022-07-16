@@ -11,6 +11,7 @@ import {
 import { error, success } from 'src/helpers/notification';
 import { useQuasar } from 'quasar';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import SearchTour from 'src/pages/tour/components/SearchTour.vue';
 import PendingNotificationTour from 'src/pages/tour/components/PendingNotificationTour.vue';
 import useService from 'src/pages/service/serviceService';
@@ -29,6 +30,7 @@ export default defineComponent({
     PendingNotificationTour,
   },
   setup() {
+    dayjs.extend(customParseFormat);
     const router = useRouter();
     const $q = useQuasar();
 
@@ -189,10 +191,10 @@ export default defineComponent({
       tours,
       loadingList,
       loadingService,
-      edit(data: Tour) {
+      edit(id: string) {
         void router.push({
           name: 'EditLsTour',
-          params: { id: data._id },
+          params: { id: id },
         });
       },
       remove(data: Tour) {
@@ -230,12 +232,7 @@ export default defineComponent({
 
         return (
           '<span class="tw-text-gray-700">Showing </span> ' +
-          `${
-            dayjs(search.value.to || new Date()).diff(
-              search.value.from || new Date(),
-              'day'
-            ) || (service.value.daysToShow as number)
-          }` +
+          `${dayjs(to, 'DD/MM/YYYY').diff(dayjs(from, 'DD/MM/YYYY'), 'day')}` +
           '<span class="tw-text-gray-700"> days. From</span> ' +
           from +
           ' <span class="tw-text-gray-700">to</span> ' +
@@ -347,7 +344,7 @@ export default defineComponent({
                             </q-tooltip>
                           </q-icon>
                           <q-icon
-                            @click.stop="edit(tour)"
+                            @click.stop="edit(tour._id)"
                             class="q-mr-sm"
                             name="edit"
                             color="teal"

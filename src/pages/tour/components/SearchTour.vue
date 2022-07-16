@@ -206,14 +206,14 @@ export default defineComponent({
             multiple
             options-selected-class="text-deep-orange"
           >
-            <template v-slot:selected-item="{opt, index}">
+            <template v-slot:selected-item="{ opt, index }">
               <q-chip class="tw-mr-2" removable @remove="removeChip(opt._id, index)">
                 <q-icon
                   v-if="opt.icon"
                   :name="opt.icon"
                   class="tw-text-2xl notification-icon-color"
                 ></q-icon>
-                <label class="tw-ml-2">{{opt.name}}</label>
+                <label class="tw-ml-2">{{ opt.name }}</label>
               </q-chip>
             </template>
             <template v-slot:option="{ opt, itemProps, toggleOption }">
@@ -223,7 +223,7 @@ export default defineComponent({
                     v-if="opt.icon"
                     :name="opt.icon"
                     class="tw-text-2xl notification-icon-color"
-                    :class="{'text-deep-orange': search.notification.includes(opt._id)}"
+                    :class="{ 'text-deep-orange': search.notification.includes(opt._id) }"
                   ></q-icon>
                 </q-item-section>
                 <q-item-section>
@@ -272,7 +272,7 @@ export default defineComponent({
               <div class="row tw-w-full">
                 <div
                   class="col"
-                  :style="{maxWidth: '30px', height: '30px', backgroundColor: scope.opt.color}"
+                  :style="{ maxWidth: '30px', height: '30px', backgroundColor: scope.opt.color }"
                 ></div>
 
                 <div class="col tw-flex tw-justify-between tw-items-center">
@@ -284,7 +284,7 @@ export default defineComponent({
             <template v-slot:option="scope">
               <q-item v-bind="scope.itemProps" class="tw-flex tw-items-center">
                 <q-section avatar>
-                  <div :style="{width: '30px', height: '30px', backgroundColor: scope.opt.color}"></div>
+                  <div :style="{ width: '30px', height: '30px', backgroundColor: scope.opt.color }"></div>
                 </q-section>
                 <q-item-section class="tw-ml-3">
                   <q-item-label v-html="scope.opt.name" />

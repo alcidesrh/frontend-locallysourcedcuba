@@ -8,7 +8,6 @@ import { error } from 'src/helpers/notification';
 import { useQuery, useLazyQuery } from '@vue/apollo-composable';
 import useEntityFactory from 'src/composables/useEntityFactory';
 import { ref } from 'vue';
-import gql from 'graphql-tag';
 
 const { items, item } = useEntityFactory<Partial<Service>>();
 

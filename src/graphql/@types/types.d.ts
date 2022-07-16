@@ -197,6 +197,7 @@ export type Guide = Node & {
   email?: Maybe<Scalars['String']>;
   phone?: Maybe<Scalars['String']>;
   bonus?: Maybe<Scalars['Int']>;
+  fullName?: Maybe<Scalars['String']>;
 };
 
 /** Connection for Guide. */
@@ -1337,6 +1338,8 @@ export type Query = {
   houseSeasonRooms?: Maybe<Array<Maybe<HouseSeasonRoom>>>;
   listTours?: Maybe<Array<Maybe<Tour>>>;
   listLsTours?: Maybe<Array<Maybe<Tour>>>;
+  listScheduleToursWithGuideTours?: Maybe<Array<Maybe<Tour>>>;
+  listScheduleToursWithoutGuideTours?: Maybe<Array<Maybe<Tour>>>;
   tour?: Maybe<Tour>;
   tours?: Maybe<Array<Maybe<Tour>>>;
   houseType?: Maybe<HouseType>;
@@ -1673,6 +1676,16 @@ export type QueryListLsToursArgs = {
   notification?: Maybe<Array<Maybe<Scalars['Int']>>>;
   notificationComplete?: Maybe<Scalars['Boolean']>;
   template?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryListScheduleToursWithGuideToursArgs = {
+  service?: Maybe<Scalars['String']>;
+  needle?: Maybe<Scalars['String']>;
+  from?: Maybe<Scalars['String']>;
+  to?: Maybe<Scalars['String']>;
+  notification?: Maybe<Array<Maybe<Scalars['Int']>>>;
+  notificationComplete?: Maybe<Scalars['Boolean']>;
 };
 
 

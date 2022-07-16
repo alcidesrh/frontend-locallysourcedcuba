@@ -238,3 +238,50 @@ mutation updateLsTourMutation($input: updateTourInput!) {
 #     }
 #   }
 # }
+
+query listTourWithGuideSheduleQuery(
+  $needle: String
+  $from: String
+  $to: String
+  $notification: [Int]
+  $notificationComplete: Boolean
+) {
+  listScheduleToursWithGuideTours(
+    needle: $needle
+    from: $from
+    to: $to
+    notification: $notification
+    notificationComplete: $notificationComplete
+  ) {
+    id
+    _id
+    code
+    service {
+      code
+    }
+    color
+    startDate
+    guide {
+      id
+    }
+    canceled
+    endDate
+    days
+  }
+}
+
+query listTourWithoutGuideSheduleQuery {
+  listScheduleToursWithoutGuideTours {
+    id
+    _id
+    color
+    startDate
+    name
+    endDate
+    days
+    code
+    service {
+      code
+    }
+  }
+}

@@ -18,12 +18,8 @@ import transferRoutes from './transfer';
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('layouts/Content.vue'),
+    component: () => import('src/pages/Layout.vue'),
     children: [
-      {
-        path: '',
-        component: () => import('pages/Index.vue'),
-      },
       ...guideRoutes,
       ...provinceRoutes,
       ...destinationRoutes,

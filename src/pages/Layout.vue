@@ -2,6 +2,8 @@
 <script>
 import { ref, defineComponent } from 'vue';
 import loading from 'src/store/loading';
+import { useRouter } from 'vue-router';
+import { onMounted } from 'vue';
 
 const rightMenu = [
   {
@@ -114,6 +116,13 @@ export default defineComponent({
   setup() {
     const leftDrawerOpen = ref(false);
     const rightDrawerOpen = ref(false);
+
+    const router = useRouter();
+    onMounted(() => {
+      if (typeof router.currentRoute.value.name == 'undefined') {
+        void router.push({ name: 'SheduleGuide' });
+      }
+    });
     return {
       loading,
       leftDrawerOpen,
@@ -191,36 +200,6 @@ svg
           </q-item-section>
 
           <q-item-section v-text="item.text"></q-item-section>
-        </q-item>
-
-        <q-separator spaced />
-
-        <q-item
-          clickable
-          v-ripple
-          :active="$route.meta?.link === 'gusdide'"
-          @click="link = 'settings'"
-          active-class="my-menu-link"
-        >
-          <q-item-section avatar>
-            <q-icon name="settings" />
-          </q-item-section>
-
-          <q-item-section>Settings</q-item-section>
-        </q-item>
-
-        <q-item
-          clickable
-          v-ripple
-          :active="$route.meta?.link === 'guisdde'"
-          @click="link = 'help'"
-          active-class="my-menu-link"
-        >
-          <q-item-section avatar>
-            <q-icon name="help" />
-          </q-item-section>
-
-          <q-item-section>Help</q-item-section>
         </q-item>
       </q-list>
     </q-drawer>
